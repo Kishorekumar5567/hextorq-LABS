@@ -13,12 +13,12 @@ import {
   FileText,
   Video,
   CreditCard,
-  ExternalLink,
+  ArrowUpRight,
 } from 'lucide-react';
 
 function ProjectHeaderTabsContent({
   project,
-  basePath, // '/agency/projects' or '/portal/projects'
+  basePath,
 }: {
   project: Project;
   basePath: string;
@@ -28,57 +28,56 @@ function ProjectHeaderTabsContent({
 
   const tabs = [
     { id: 'overview', label: 'Overview', icon: Layers },
-    { id: 'milestones', label: 'Milestones & Sign-Offs', icon: CheckCircle2 },
-    { id: 'feedback', label: 'Review Studio & Preview', icon: Eye },
-    { id: 'tickets', label: 'Tickets & Issues', icon: TicketIcon },
-    { id: 'files', label: 'Shared Files', icon: FolderDown },
-    { id: 'notes', label: 'Specs & Notes', icon: FileText },
-    { id: 'meetings', label: 'Video Meetings', icon: Video },
-    { id: 'invoices', label: 'Invoices & Billing', icon: CreditCard },
+    { id: 'milestones', label: 'Milestones', icon: CheckCircle2 },
+    { id: 'feedback', label: 'Review Studio', icon: Eye },
+    { id: 'tickets', label: 'Tickets', icon: TicketIcon },
+    { id: 'files', label: 'Files', icon: FolderDown },
+    { id: 'notes', label: 'Notes', icon: FileText },
+    { id: 'meetings', label: 'Meetings', icon: Video },
+    { id: 'invoices', label: 'Invoices', icon: CreditCard },
   ];
 
   return (
-    <div className="border-b border-slate-800 bg-[#0B0F1C]/80 backdrop-blur-md sticky top-0 z-30">
-      {/* Project Banner */}
-      <div className="max-w-7xl mx-auto px-6 pt-6 pb-4">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div className="border-b border-white/[0.07] bg-[#0A0B10]/95 backdrop-blur-md sticky top-0 z-30 select-none">
+      <div className="max-w-7xl mx-auto px-6 pt-5 pb-0">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4">
           <div>
             <div className="flex items-center gap-2.5">
-              <h1 className="text-xl md:text-2xl font-bold text-white tracking-tight">
+              <h1 className="text-xl font-bold text-zinc-100 tracking-tight">
                 {project.name}
               </h1>
-              <span className={`px-2.5 py-0.5 rounded-full text-xs font-semibold ${
+              <span className={`px-2 py-0.5 rounded text-[10px] font-mono uppercase font-semibold ${
                 project.status === 'active' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' :
                 project.status === 'in_review' ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20' :
-                'bg-slate-700/40 text-slate-300'
+                'bg-zinc-800 text-zinc-400'
               }`}>
-                {project.status.replace('_', ' ').toUpperCase()}
+                {project.status.replace('_', ' ')}
               </span>
             </div>
-            <p className="text-xs md:text-sm text-slate-400 mt-1 line-clamp-1 max-w-2xl">
+            <p className="text-xs text-zinc-400 mt-1 line-clamp-1 max-w-2xl">
               {project.description}
             </p>
           </div>
 
           <div className="flex items-center gap-3">
             <div className="text-right hidden sm:block">
-              <span className="text-xs text-slate-400">Total Budget</span>
-              <p className="text-sm font-bold text-white">
+              <span className="text-[11px] text-zinc-500 block font-mono">Total Budget</span>
+              <p className="text-xs font-semibold text-zinc-200 font-mono">
                 ${project.budget.toLocaleString()} {project.currency}
               </p>
             </div>
             <Link
               href={`${basePath}/${project.id}/feedback`}
-              className="px-3.5 py-2 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white text-xs font-semibold shadow-lg shadow-indigo-600/25 flex items-center gap-1.5 transition-all"
+              className="px-3.5 py-1.5 rounded-lg bg-zinc-100 hover:bg-white text-zinc-950 text-xs font-semibold shadow-xs flex items-center gap-1.5 transition-all"
             >
               <Eye className="w-3.5 h-3.5" />
-              <span>Open Review Studio</span>
+              <span>Launch Studio</span>
             </Link>
           </div>
         </div>
 
         {/* Tab Navigation */}
-        <div className="flex items-center gap-1 overflow-x-auto mt-6 -mb-4 scrollbar-none">
+        <div className="flex items-center gap-1 overflow-x-auto scrollbar-none border-t border-white/[0.05]">
           {tabs.map((tab) => {
             const Icon = tab.icon;
             const href = `${basePath}/${project.id}/${tab.id}`;
@@ -87,13 +86,13 @@ function ProjectHeaderTabsContent({
               <Link
                 key={tab.id}
                 href={href}
-                className={`flex items-center gap-2 px-4 py-3 text-xs md:text-sm font-medium border-b-2 whitespace-nowrap transition-all ${
+                className={`flex items-center gap-2 px-3.5 py-2.5 text-xs font-medium border-b-2 whitespace-nowrap transition-all ${
                   isActive
-                    ? 'border-indigo-500 text-indigo-400 font-semibold bg-indigo-500/5'
-                    : 'border-transparent text-slate-400 hover:text-slate-200 hover:border-slate-700'
+                    ? 'border-zinc-100 text-zinc-100 font-semibold'
+                    : 'border-transparent text-zinc-400 hover:text-zinc-200'
                 }`}
               >
-                <Icon className={`w-4 h-4 ${isActive ? 'text-indigo-400' : 'text-slate-400'}`} />
+                <Icon className={`w-3.5 h-3.5 ${isActive ? 'text-zinc-100' : 'text-zinc-500'}`} />
                 <span>{tab.label}</span>
               </Link>
             );
@@ -106,7 +105,7 @@ function ProjectHeaderTabsContent({
 
 export function ProjectHeaderTabs(props: { project: Project; basePath: string }) {
   return (
-    <Suspense fallback={<div className="h-24 bg-[#0B0F1C]/80 border-b border-slate-800" />}>
+    <Suspense fallback={<div className="h-20 bg-[#0A0B10] border-b border-white/[0.07]" />}>
       <ProjectHeaderTabsContent {...props} />
     </Suspense>
   );

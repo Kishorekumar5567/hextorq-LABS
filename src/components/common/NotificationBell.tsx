@@ -16,22 +16,22 @@ export function NotificationBell() {
     <div className="relative">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="relative p-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+        className="relative p-1.5 rounded-md text-zinc-400 hover:text-zinc-200 hover:bg-white/[0.04] transition-colors"
         aria-label="Notifications"
       >
-        <Bell className="w-5 h-5" />
+        <Bell className="w-4 h-4" />
         {unreadCount > 0 && (
-          <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-indigo-500 rounded-full ring-2 ring-[#080C15] animate-pulse" />
+          <span className="absolute top-1 right-1 w-1.5 h-1.5 bg-emerald-400 rounded-full" />
         )}
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-80 md:w-96 rounded-xl glass-panel-elevated p-4 shadow-2xl z-50 border border-slate-700/60 animate-in fade-in duration-150">
-          <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+        <div className="absolute right-0 mt-2 w-80 md:w-96 rounded-lg bg-[#0E1017] p-4 shadow-2xl z-50 border border-white/[0.1] animate-in fade-in duration-100">
+          <div className="flex items-center justify-between pb-3 border-b border-white/[0.06]">
             <div className="flex items-center gap-2">
-              <span className="font-semibold text-sm text-white">Notifications</span>
+              <span className="font-semibold text-xs text-zinc-100">Notifications</span>
               {unreadCount > 0 && (
-                <span className="text-[10px] bg-indigo-500/20 text-indigo-400 px-1.5 py-0.5 rounded-full font-medium">
+                <span className="text-[10px] bg-white/[0.08] text-zinc-300 font-mono px-1.5 py-0.2 rounded">
                   {unreadCount} unread
                 </span>
               )}
@@ -41,32 +41,32 @@ export function NotificationBell() {
                 notifications.forEach(n => (n.is_read = true));
                 setIsOpen(false);
               }}
-              className="text-xs text-slate-400 hover:text-slate-200 flex items-center gap-1"
+              className="text-[11px] text-zinc-500 hover:text-zinc-300 flex items-center gap-1 font-mono transition-colors"
             >
               <Check className="w-3 h-3" /> Mark all read
             </button>
           </div>
 
-          <div className="divide-y divide-slate-800/60 max-h-80 overflow-y-auto mt-2">
+          <div className="divide-y divide-white/[0.04] max-h-80 overflow-y-auto mt-1">
             {notifications.length === 0 ? (
-              <p className="text-xs text-slate-500 text-center py-6">No notifications</p>
+              <p className="text-xs text-zinc-500 font-mono text-center py-6">No notifications</p>
             ) : (
               notifications.map((n) => (
-                <div key={n.id} className="py-2.5 px-1 hover:bg-slate-800/40 rounded-lg transition-colors">
+                <div key={n.id} className="py-2.5 px-1 hover:bg-white/[0.02] rounded transition-colors">
                   <div className="flex items-start justify-between gap-2">
-                    <p className="text-xs font-medium text-slate-200">{n.title}</p>
-                    <span className="text-[10px] text-slate-500 whitespace-nowrap">
+                    <p className="text-xs font-medium text-zinc-200">{n.title}</p>
+                    <span className="text-[10px] text-zinc-500 font-mono whitespace-nowrap">
                       {new Date(n.created_at).toLocaleDateString()}
                     </span>
                   </div>
-                  <p className="text-xs text-slate-400 mt-1 line-clamp-2">{n.message}</p>
+                  <p className="text-xs text-zinc-400 mt-1 line-clamp-2 leading-relaxed">{n.message}</p>
                   {n.link && (
                     <Link
                       href={n.link}
                       onClick={() => setIsOpen(false)}
-                      className="inline-flex items-center gap-1 text-[11px] text-indigo-400 hover:text-indigo-300 mt-1.5 font-medium"
+                      className="inline-flex items-center gap-1 text-[11px] text-zinc-300 hover:text-white mt-1.5 font-medium transition-colors"
                     >
-                      View details <ExternalLink className="w-2.5 h-2.5" />
+                      View details <ExternalLink className="w-2.5 h-2.5 text-zinc-500" />
                     </Link>
                   )}
                 </div>

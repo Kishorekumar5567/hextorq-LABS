@@ -31,45 +31,57 @@ export default function ClientMeetingsPage({
       <ProjectHeaderTabs project={project} basePath="/portal/projects" />
 
       <div className="p-6 md:p-8 max-w-7xl mx-auto w-full space-y-6">
-        <div>
-          <h2 className="text-xl font-bold text-white tracking-tight">Scheduled Video Meetings</h2>
-          <p className="text-xs text-slate-400 mt-1">
-            Sync with your dedicated engineering leads, review live code, and confirm milestone deliverables.
+        <div className="border-b border-white/[0.06] pb-5">
+          <div className="flex items-center gap-2 text-xs font-mono text-zinc-500 mb-1">
+            <span>SYNC</span>
+            <span>/</span>
+            <span className="text-zinc-300">LIVEKIT VIDEO ROOMS</span>
+          </div>
+          <h2 className="text-xl font-semibold text-zinc-100 tracking-tight">Scheduled Video Consultations</h2>
+          <p className="text-xs text-zinc-400 mt-0.5">
+            Sync with your designated engineering leads, review live code, and confirm milestone deliverables.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {meetings.map((m) => (
             <div
               key={m.id}
-              className="p-6 rounded-2xl glass-panel border border-slate-800 space-y-4 hover:border-purple-500/30 transition-all"
+              className="p-5 rounded-lg bg-[#0E1017] border border-white/[0.07] hover:border-white/[0.14] transition-all space-y-3.5 flex flex-col justify-between"
             >
-              <div className="flex items-start justify-between gap-4">
-                <div>
-                  <span className="text-[10px] font-bold text-purple-400 uppercase tracking-wider">
-                    Client Meeting Room
+              <div className="space-y-2.5">
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <span className="text-[10px] font-mono uppercase tracking-wider text-zinc-500 bg-white/[0.04] border border-white/[0.06] px-1.5 py-0.5 rounded">
+                      LiveKit WebRTC
+                    </span>
+                    <h3 className="text-sm font-semibold text-zinc-100 mt-1.5">{m.title}</h3>
+                  </div>
+                  <span className={`px-2 py-0.5 rounded text-[10px] font-mono uppercase tracking-wide border shrink-0 ${
+                    m.status === 'scheduled'
+                      ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
+                      : 'bg-white/[0.04] text-zinc-400 border-white/[0.06]'
+                  }`}>
+                    {m.status}
                   </span>
-                  <h3 className="text-base font-bold text-white mt-0.5">{m.title}</h3>
-                  <p className="text-xs text-slate-400 mt-1 leading-relaxed">{m.description}</p>
                 </div>
-                <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-purple-500/10 text-purple-300 border border-purple-500/20 uppercase shrink-0">
-                  {m.status}
-                </span>
+
+                <p className="text-xs text-zinc-400 leading-relaxed line-clamp-2">{m.description}</p>
+
+                <div className="flex items-center gap-2 text-xs text-zinc-400 font-mono bg-[#090A0F] p-2.5 rounded-md border border-white/[0.05]">
+                  <Clock className="w-3.5 h-3.5 text-zinc-500" />
+                  <span>{new Date(m.start_time).toLocaleString()} ({m.time_zone})</span>
+                </div>
               </div>
 
-              <div className="flex items-center gap-2 text-xs text-slate-300 bg-slate-900/80 p-3 rounded-xl border border-slate-800/80">
-                <Clock className="w-4 h-4 text-purple-400" />
-                <span>{new Date(m.start_time).toLocaleString()} ({m.time_zone})</span>
-              </div>
-
-              <div className="pt-2 border-t border-slate-800/80 flex items-center justify-between">
-                <span className="text-xs text-slate-500">Host: {m.creator?.full_name || 'Agency Lead'}</span>
+              <div className="pt-3 border-t border-white/[0.05] flex items-center justify-between text-xs">
+                <span className="text-[11px] text-zinc-500 font-mono">Lead: {m.creator?.full_name || 'Agency Lead'}</span>
                 <button
                   onClick={() => setActiveMeeting(m)}
-                  className="px-4 py-2 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-semibold text-xs shadow-lg shadow-purple-600/20 flex items-center gap-1.5 transition-all"
+                  className="btn-primary"
                 >
                   <Video className="w-3.5 h-3.5" />
-                  <span>Join Video Call</span>
+                  <span>Join Session</span>
                 </button>
               </div>
             </div>

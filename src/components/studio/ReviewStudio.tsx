@@ -8,18 +8,17 @@ import {
   Monitor,
   Tablet,
   Smartphone,
-  Maximize2,
-  PlusCircle,
-  CheckCircle2,
-  AlertCircle,
-  MessageSquare,
+  Plus,
+  Check,
   Lock,
   ExternalLink,
-  RotateCcw,
-  Sparkles,
-  Ticket,
-  ChevronRight,
+  GitBranch,
   ShieldCheck,
+  Ticket,
+  SlidersHorizontal,
+  ChevronRight,
+  MessageSquare,
+  CornerDownLeft,
 } from 'lucide-react';
 
 export function ReviewStudio({
@@ -60,8 +59,8 @@ export function ReviewStudio({
   const canvasRef = useRef<HTMLDivElement>(null);
 
   // Viewport sizes
-  const viewportWidths = {
-    desktop: 'w-full max-w-[1280px]',
+  const viewportStyles = {
+    desktop: 'w-full max-w-[1240px]',
     tablet: 'w-[768px]',
     mobile: 'w-[375px]',
   };
@@ -183,165 +182,165 @@ export function ReviewStudio({
   const activeAnnotation = annotations.find((a) => a.id === activePinId);
 
   return (
-    <div className="flex flex-col h-[calc(100vh-140px)] bg-[#070A12] overflow-hidden">
-      {/* Studio Toolbar */}
-      <div className="border-b border-slate-800 bg-[#0B0F1C] px-6 py-3 flex items-center justify-between gap-4 shrink-0">
+    <div className="flex flex-col h-[calc(100vh-125px)] bg-[#07080C] overflow-hidden select-none">
+      {/* Studio Precision Toolbar */}
+      <div className="border-b border-white/[0.07] bg-[#0A0B10] px-4 py-2 flex items-center justify-between gap-4 shrink-0">
         <div className="flex items-center gap-3">
-          <div className="flex items-center gap-1 bg-slate-900 border border-slate-800 p-1 rounded-xl">
+          {/* Viewport Segmented Control */}
+          <div className="flex items-center gap-0.5 bg-[#12141C] border border-white/[0.07] p-0.5 rounded-lg">
             <button
               onClick={() => setViewport('desktop')}
-              className={`p-2 rounded-lg text-xs font-medium flex items-center gap-1.5 transition-all ${
-                viewport === 'desktop' ? 'bg-indigo-600 text-white shadow' : 'text-slate-400 hover:text-white'
+              className={`px-2.5 py-1 rounded text-xs font-medium flex items-center gap-1.5 transition-all ${
+                viewport === 'desktop' ? 'bg-zinc-100 text-zinc-950 font-semibold shadow-xs' : 'text-zinc-400 hover:text-zinc-200'
               }`}
             >
-              <Monitor className="w-4 h-4" />
+              <Monitor className="w-3.5 h-3.5" />
               <span className="hidden sm:inline">1440px</span>
             </button>
             <button
               onClick={() => setViewport('tablet')}
-              className={`p-2 rounded-lg text-xs font-medium flex items-center gap-1.5 transition-all ${
-                viewport === 'tablet' ? 'bg-indigo-600 text-white shadow' : 'text-slate-400 hover:text-white'
+              className={`px-2.5 py-1 rounded text-xs font-medium flex items-center gap-1.5 transition-all ${
+                viewport === 'tablet' ? 'bg-zinc-100 text-zinc-950 font-semibold shadow-xs' : 'text-zinc-400 hover:text-zinc-200'
               }`}
             >
-              <Tablet className="w-4 h-4" />
+              <Tablet className="w-3.5 h-3.5" />
               <span className="hidden sm:inline">768px</span>
             </button>
             <button
               onClick={() => setViewport('mobile')}
-              className={`p-2 rounded-lg text-xs font-medium flex items-center gap-1.5 transition-all ${
-                viewport === 'mobile' ? 'bg-indigo-600 text-white shadow' : 'text-slate-400 hover:text-white'
+              className={`px-2.5 py-1 rounded text-xs font-medium flex items-center gap-1.5 transition-all ${
+                viewport === 'mobile' ? 'bg-zinc-100 text-zinc-950 font-semibold shadow-xs' : 'text-zinc-400 hover:text-zinc-200'
               }`}
             >
-              <Smartphone className="w-4 h-4" />
+              <Smartphone className="w-3.5 h-3.5" />
               <span className="hidden sm:inline">375px</span>
             </button>
           </div>
 
           <button
             onClick={() => setIsAddMode(!isAddMode)}
-            className={`px-3.5 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 transition-all ${
+            className={`px-3 py-1.5 rounded-lg text-xs font-medium flex items-center gap-1.5 transition-all border ${
               isAddMode
-                ? 'bg-amber-500 text-slate-950 font-bold shadow-lg shadow-amber-500/30 animate-pulse'
-                : 'bg-indigo-600/20 text-indigo-300 hover:bg-indigo-600/30 border border-indigo-500/30'
+                ? 'bg-amber-400 text-zinc-950 font-bold border-amber-300 shadow-xs'
+                : 'bg-white/[0.04] text-zinc-300 hover:bg-white/[0.08] border-white/[0.08]'
             }`}
           >
-            <PlusCircle className="w-4 h-4" />
-            <span>{isAddMode ? 'Click Canvas to Pin...' : 'Add Pin Feedback'}</span>
+            <Plus className="w-3.5 h-3.5" />
+            <span>{isAddMode ? 'Click Canvas to Pin...' : 'Drop Pin Feedback'}</span>
           </button>
         </div>
 
-        {/* Deployment Info & Actions */}
+        {/* Deployment Header */}
         <div className="flex items-center gap-3">
           {initialPreview ? (
-            <div className="flex items-center gap-2 text-xs text-slate-400 bg-slate-900/80 px-3 py-1.5 rounded-xl border border-slate-800">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-              <span className="font-mono text-slate-300">{initialPreview.git_branch}</span>
+            <div className="flex items-center gap-2 text-xs bg-white/[0.03] px-2.5 py-1 rounded-md border border-white/[0.06] text-zinc-400 font-mono">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+              <span>{initialPreview.git_branch}</span>
               <a
                 href={initialPreview.deployment_url}
                 target="_blank"
                 rel="noreferrer"
-                className="text-indigo-400 hover:text-indigo-300 flex items-center gap-1 ml-1"
+                className="text-zinc-300 hover:text-white flex items-center gap-1 ml-1"
               >
-                <span>External</span> <ExternalLink className="w-3 h-3" />
+                <ExternalLink className="w-3 h-3" />
               </a>
             </div>
           ) : (
-            <span className="text-xs text-amber-400">No current preview</span>
+            <span className="text-xs text-amber-400 font-mono">No preview</span>
           )}
 
           {isAgencyStaff && (
             <button
               onClick={() => setShowDeployModal(true)}
-              className="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-medium border border-slate-700 transition-colors"
+              className="px-2.5 py-1 rounded-md bg-white/[0.05] hover:bg-white/[0.08] text-zinc-300 text-xs font-medium border border-white/[0.08] transition-colors"
             >
-              Register Preview
+              Deploy Preview
             </button>
           )}
         </div>
       </div>
 
-      {/* Main Studio Area */}
+      {/* Main Studio Workspace */}
       <div className="flex-1 flex overflow-hidden">
         {/* Canvas Area */}
-        <div className="flex-1 bg-[#05070E] overflow-auto flex items-center justify-center p-6 relative">
+        <div className="flex-1 bg-[#050608] overflow-auto flex items-center justify-center p-6 relative">
           <div
             ref={canvasRef}
             onClick={handleCanvasClick}
-            className={`${viewportWidths[viewport]} min-h-[640px] rounded-2xl border border-slate-700/80 bg-[#0E1524] shadow-2xl relative transition-all duration-300 overflow-hidden select-none ${
-              isAddMode ? 'cursor-crosshair ring-2 ring-indigo-500/50' : 'cursor-default'
+            className={`${viewportStyles[viewport]} min-h-[640px] rounded-xl border border-white/[0.08] bg-[#0E1017] shadow-2xl relative transition-all duration-200 overflow-hidden ${
+              isAddMode ? 'cursor-crosshair ring-1 ring-amber-400/50' : 'cursor-default'
             }`}
           >
-            {/* Mock website header bar */}
-            <div className="border-b border-slate-800/80 bg-[#121A2C] px-4 py-3 flex items-center justify-between text-xs text-slate-400">
+            {/* Minimalist Browser Frame Bar */}
+            <div className="border-b border-white/[0.07] bg-[#12141D] px-3.5 py-2 flex items-center justify-between text-xs text-zinc-400 font-mono">
               <div className="flex items-center gap-2">
-                <div className="w-2.5 h-2.5 rounded-full bg-rose-500/60" />
-                <div className="w-2.5 h-2.5 rounded-full bg-amber-500/60" />
-                <div className="w-2.5 h-2.5 rounded-full bg-emerald-500/60" />
-                <span className="ml-2 font-mono text-slate-300">
-                  {initialPreview ? initialPreview.deployment_url : 'https://apex-preview.vercel.app/checkout'}
+                <div className="flex items-center gap-1.5">
+                  <div className="w-2.5 h-2.5 rounded-full bg-zinc-700" />
+                  <div className="w-2.5 h-2.5 rounded-full bg-zinc-700" />
+                  <div className="w-2.5 h-2.5 rounded-full bg-zinc-700" />
+                </div>
+                <div className="bg-[#090A0E] px-3 py-1 rounded text-[11px] text-zinc-300 border border-white/[0.05] ml-2 flex items-center gap-1.5">
+                  <Lock className="w-2.5 h-2.5 text-zinc-500" />
+                  <span>{initialPreview ? initialPreview.deployment_url : 'https://apex-preview.vercel.app/checkout'}</span>
+                </div>
+              </div>
+              <span className="text-[10px] text-zinc-500">STAGING PREVIEW</span>
+            </div>
+
+            {/* Rendered Staging Webpage (Apex Checkout 2.0) */}
+            <div className="p-8 space-y-6 text-zinc-100 max-w-2xl mx-auto">
+              <div className="space-y-1">
+                <span className="text-[11px] font-mono text-zinc-400 uppercase tracking-wider">
+                  Apex Global · Checkout v2.4
                 </span>
+                <h2 className="text-xl font-bold tracking-tight text-white">
+                  Payment Authorization & Review
+                </h2>
               </div>
-              <span className="text-[11px] bg-slate-800 px-2 py-0.5 rounded text-indigo-400 font-mono">
-                SDK Connected
-              </span>
-            </div>
 
-            {/* Simulated Live Staging Page for Apex Checkout */}
-            <div className="p-8 space-y-6 text-slate-100">
-              <div className="max-w-2xl mx-auto space-y-6">
-                <div className="space-y-2">
-                  <span className="text-xs font-semibold text-indigo-400 uppercase tracking-wider">
-                    Apex Global Store · Express Checkout
-                  </span>
-                  <h2 className="text-2xl font-bold tracking-tight text-white">
-                    Review & Complete Order
-                  </h2>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="p-4 rounded-xl bg-slate-900/80 border border-slate-800 space-y-3">
-                    <h3 className="text-xs font-semibold text-slate-400 uppercase">Cart Items (2)</h3>
-                    <div className="flex justify-between text-sm">
-                      <span>Pro Wireless Earbuds Gen 2</span>
-                      <span className="font-semibold text-white">$189.00</span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span>Leather Travel Case (Midnight)</span>
-                      <span className="font-semibold text-white">$45.00</span>
-                    </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+                <div className="p-3.5 rounded-lg bg-zinc-900/60 border border-white/[0.06] space-y-2">
+                  <span className="font-semibold text-zinc-300 uppercase tracking-wide text-[10px]">Order Summary</span>
+                  <div className="flex justify-between text-zinc-300">
+                    <span>Pro Wireless Earbuds</span>
+                    <span className="font-semibold text-white">$189.00</span>
                   </div>
-
-                  <div className="p-4 rounded-xl bg-slate-900/80 border border-slate-800 space-y-3">
-                    <h3 className="text-xs font-semibold text-slate-400 uppercase">Payment Summary</h3>
-                    <div className="flex justify-between text-sm text-slate-400">
-                      <span>Subtotal</span>
-                      <span>$234.00</span>
-                    </div>
-                    <div className="flex justify-between text-sm text-slate-400">
-                      <span>Estimated Regional VAT (20%)</span>
-                      <span>$46.80</span>
-                    </div>
-                    <div className="border-t border-slate-800 pt-2 flex justify-between font-bold text-white">
-                      <span>Total Due</span>
-                      <span className="text-emerald-400">$280.80 USD</span>
-                    </div>
+                  <div className="flex justify-between text-zinc-300">
+                    <span>Travel Case Midnight</span>
+                    <span className="font-semibold text-white">$45.00</span>
                   </div>
                 </div>
 
-                {/* The checkout submit button that was annotated */}
-                <div id="btn-submit-payment" className="p-4 rounded-xl bg-slate-900/60 border border-slate-800">
-                  <button className="w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-slate-950 font-bold text-sm shadow-lg shadow-emerald-500/20 transition-all flex items-center justify-center gap-2">
-                    <ShieldCheck className="w-4 h-4" />
-                    <span>Authorize Payment & Confirm Order</span>
-                  </button>
-                  <p className="text-[11px] text-center text-slate-400 mt-2">
-                    256-bit encrypted checkout via Stripe & Nexus Cloud.
-                  </p>
+                <div className="p-3.5 rounded-lg bg-zinc-900/60 border border-white/[0.06] space-y-2">
+                  <span className="font-semibold text-zinc-300 uppercase tracking-wide text-[10px]">Taxes & Total</span>
+                  <div className="flex justify-between text-zinc-400">
+                    <span>Subtotal</span>
+                    <span>$234.00</span>
+                  </div>
+                  <div className="flex justify-between text-zinc-400">
+                    <span>Estimated VAT (20%)</span>
+                    <span>$46.80</span>
+                  </div>
+                  <div className="border-t border-white/[0.06] pt-1.5 flex justify-between font-bold text-white">
+                    <span>Total Due</span>
+                    <span>$280.80 USD</span>
+                  </div>
                 </div>
+              </div>
+
+              {/* The element annotated with pin #1 */}
+              <div id="interactive-preview-canvas" className="p-4 rounded-xl bg-zinc-900/40 border border-white/[0.06]">
+                <button className="w-full py-3 px-4 rounded-lg bg-zinc-100 hover:bg-white text-zinc-950 font-semibold text-xs shadow-xs transition-all flex items-center justify-center gap-2">
+                  <ShieldCheck className="w-4 h-4" />
+                  <span>Authorize Payment & Confirm Order</span>
+                </button>
+                <p className="text-[11px] text-center text-zinc-500 mt-2 font-mono">
+                  Encrypted checkout via Stripe & Nexus Cloud.
+                </p>
               </div>
             </div>
 
-            {/* Pinned Feedback Indicators on Canvas */}
+            {/* Visual Feedback Pins Placed on Canvas */}
             {annotations.map((anno) => {
               const isResolved = anno.status === 'resolved';
               const isSelected = activePinId === anno.id;
@@ -357,37 +356,37 @@ export function ReviewStudio({
                     top: `${anno.position_y}%`,
                   }}
                   className={`absolute -translate-x-1/2 -translate-y-1/2 cursor-pointer z-20 group transition-all transform ${
-                    isSelected ? 'scale-125' : 'hover:scale-110'
+                    isSelected ? 'scale-110' : 'hover:scale-105'
                   }`}
                 >
                   <div
-                    className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-extrabold shadow-xl border-2 transition-all ${
+                    className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-mono font-bold shadow-lg border transition-all ${
                       isResolved
-                        ? 'bg-slate-700 text-slate-300 border-slate-500'
+                        ? 'bg-zinc-800 text-zinc-400 border-zinc-700'
                         : isSelected
-                        ? 'bg-indigo-600 text-white border-white shadow-indigo-600/50 ring-4 ring-indigo-400/30'
-                        : 'bg-indigo-500 text-white border-indigo-200 shadow-indigo-500/40'
+                        ? 'bg-zinc-100 text-zinc-950 border-white ring-4 ring-white/15'
+                        : 'bg-zinc-900 text-white border-white/20'
                     }`}
                   >
                     {anno.pin_number}
                   </div>
 
-                  {/* Tooltip on Hover */}
-                  <div className="absolute left-1/2 -translate-x-1/2 top-full mt-2 hidden group-hover:block z-30 w-48 p-2 rounded-lg bg-slate-900/95 border border-slate-700 text-slate-200 text-xs shadow-xl pointer-events-none">
-                    <p className="font-semibold text-white line-clamp-1">{anno.title}</p>
-                    <p className="text-[10px] text-slate-400">{anno.priority.toUpperCase()} · {anno.status}</p>
+                  {/* Micro Tooltip on Hover */}
+                  <div className="absolute left-1/2 -translate-x-1/2 top-full mt-2 hidden group-hover:block z-30 w-48 p-2 rounded-lg bg-[#0E1017] border border-white/[0.1] text-zinc-200 text-xs shadow-xl pointer-events-none">
+                    <p className="font-semibold text-zinc-100 truncate">{anno.title}</p>
+                    <p className="text-[10px] text-zinc-400 font-mono mt-0.5 uppercase">{anno.priority} · {anno.status}</p>
                   </div>
                 </div>
               );
             })}
 
-            {/* Draft Pin Drop Marker */}
+            {/* Draft Marker */}
             {draftPin && (
               <div
                 style={{ left: `${draftPin.x}%`, top: `${draftPin.y}%` }}
                 className="absolute -translate-x-1/2 -translate-y-1/2 z-30"
               >
-                <div className="w-8 h-8 rounded-full bg-amber-400 text-slate-950 font-bold flex items-center justify-center text-xs border-2 border-white animate-bounce shadow-xl">
+                <div className="w-7 h-7 rounded-full bg-amber-400 text-zinc-950 font-bold flex items-center justify-center text-xs border border-white animate-pulse shadow-lg font-mono">
                   +
                 </div>
               </div>
@@ -395,60 +394,60 @@ export function ReviewStudio({
           </div>
         </div>
 
-        {/* Feedback Details & Comment Sidebar */}
-        <div className="w-96 border-l border-slate-800 bg-[#0B0F1C] flex flex-col shrink-0">
-          <div className="p-4 border-b border-slate-800 flex items-center justify-between">
-            <h3 className="font-bold text-white text-sm">Visual Annotations ({annotations.length})</h3>
-            <div className="flex items-center gap-1 text-xs">
+        {/* Right Inspector & Discussion Sidebar */}
+        <div className="w-88 border-l border-white/[0.07] bg-[#0A0B10] flex flex-col shrink-0">
+          <div className="p-3 border-b border-white/[0.07] flex items-center justify-between">
+            <span className="font-semibold text-zinc-100 text-xs">Review Pins ({annotations.length})</span>
+            <div className="flex items-center gap-1 text-[11px] bg-white/[0.04] p-0.5 rounded-md border border-white/[0.06]">
               <button
                 onClick={() => setStatusFilter('all')}
-                className={`px-2 py-0.5 rounded ${statusFilter === 'all' ? 'bg-indigo-600 text-white' : 'text-slate-400'}`}
+                className={`px-2 py-0.5 rounded ${statusFilter === 'all' ? 'bg-zinc-700 text-white font-medium' : 'text-zinc-400'}`}
               >
                 All
               </button>
               <button
                 onClick={() => setStatusFilter('open')}
-                className={`px-2 py-0.5 rounded ${statusFilter === 'open' ? 'bg-indigo-600 text-white' : 'text-slate-400'}`}
+                className={`px-2 py-0.5 rounded ${statusFilter === 'open' ? 'bg-zinc-700 text-white font-medium' : 'text-zinc-400'}`}
               >
                 Open
               </button>
               <button
                 onClick={() => setStatusFilter('resolved')}
-                className={`px-2 py-0.5 rounded ${statusFilter === 'resolved' ? 'bg-indigo-600 text-white' : 'text-slate-400'}`}
+                className={`px-2 py-0.5 rounded ${statusFilter === 'resolved' ? 'bg-zinc-700 text-white font-medium' : 'text-zinc-400'}`}
               >
                 Resolved
               </button>
             </div>
           </div>
 
-          {/* Draft Pin Form Modal / Drawer */}
+          {/* New Pin Form */}
           {draftPin && (
-            <div className="p-4 bg-slate-900/90 border-b border-indigo-500/30 space-y-3">
+            <div className="p-4 bg-[#12141E] border-b border-white/[0.08] space-y-3">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-semibold text-amber-400">New Pin Feedback</span>
-                <button onClick={() => setDraftPin(null)} className="text-xs text-slate-500 hover:text-white">
+                <span className="text-xs font-semibold text-amber-400">New Feedback Pin</span>
+                <button onClick={() => setDraftPin(null)} className="text-xs text-zinc-500 hover:text-white">
                   Cancel
                 </button>
               </div>
               <input
                 type="text"
-                placeholder="Feedback summary..."
+                placeholder="Issue summary..."
                 value={draftPin.title}
                 onChange={(e) => setDraftPin({ ...draftPin, title: e.target.value })}
-                className="w-full text-xs p-2.5 rounded-lg bg-slate-950 border border-slate-700 text-white focus:outline-none focus:border-indigo-500"
+                className="w-full text-xs p-2 rounded-md bg-[#090A0E] border border-white/[0.08] text-white focus:outline-none focus:border-zinc-400"
               />
               <textarea
-                rows={3}
-                placeholder="Detailed notes or suggested change..."
+                rows={2}
+                placeholder="Notes or recommendation..."
                 value={draftPin.description}
                 onChange={(e) => setDraftPin({ ...draftPin, description: e.target.value })}
-                className="w-full text-xs p-2.5 rounded-lg bg-slate-950 border border-slate-700 text-white focus:outline-none focus:border-indigo-500"
+                className="w-full text-xs p-2 rounded-md bg-[#090A0E] border border-white/[0.08] text-white focus:outline-none focus:border-zinc-400"
               />
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between pt-1">
                 <select
                   value={draftPin.priority}
                   onChange={(e) => setDraftPin({ ...draftPin, priority: e.target.value as any })}
-                  className="text-xs bg-slate-950 border border-slate-700 rounded-lg p-1.5 text-slate-300"
+                  className="text-xs bg-[#090A0E] border border-white/[0.08] rounded-md p-1.5 text-zinc-300"
                 >
                   <option value="low">Low Priority</option>
                   <option value="medium">Medium</option>
@@ -457,7 +456,7 @@ export function ReviewStudio({
                 </select>
                 <button
                   onClick={submitDraftPin}
-                  className="px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold"
+                  className="px-3 py-1.5 rounded-md bg-zinc-100 hover:bg-white text-zinc-950 text-xs font-semibold"
                 >
                   Post Pin
                 </button>
@@ -465,45 +464,45 @@ export function ReviewStudio({
             </div>
           )}
 
-          {/* Active Pin Detailed Thread View */}
+          {/* Active Pin Detail Thread */}
           {activeAnnotation ? (
             <div className="flex-1 flex flex-col overflow-hidden">
-              <div className="p-4 border-b border-slate-800 space-y-3">
+              <div className="p-4 border-b border-white/[0.07] space-y-3">
                 <div className="flex items-center justify-between">
                   <button
                     onClick={() => setActivePinId(null)}
-                    className="text-xs text-indigo-400 hover:underline flex items-center gap-1"
+                    className="text-xs text-zinc-400 hover:text-white flex items-center gap-1 font-mono"
                   >
-                    ← Back to list
+                    ← All issues
                   </button>
-                  <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold uppercase ${
-                    activeAnnotation.status === 'resolved' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-amber-500/20 text-amber-400'
+                  <span className={`text-[10px] font-mono px-2 py-0.5 rounded font-bold uppercase ${
+                    activeAnnotation.status === 'resolved' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-white/[0.06] text-zinc-300'
                   }`}>
                     {activeAnnotation.status}
                   </span>
                 </div>
 
                 <div>
-                  <h4 className="font-semibold text-white text-sm">
-                    #{activeAnnotation.pin_number}: {activeAnnotation.title}
+                  <h4 className="font-semibold text-zinc-100 text-xs">
+                    Pin #{activeAnnotation.pin_number}: {activeAnnotation.title}
                   </h4>
-                  <p className="text-xs text-slate-300 mt-1.5 leading-relaxed">
+                  <p className="text-xs text-zinc-400 mt-1 leading-relaxed">
                     {activeAnnotation.description}
                   </p>
                 </div>
 
-                {/* Actions: Convert to ticket & Resolve */}
+                {/* Actions */}
                 <div className="flex items-center gap-2 pt-1">
                   <button
                     onClick={() => handleToggleResolve(activeAnnotation)}
-                    className="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs text-slate-200 font-medium flex items-center gap-1.5 transition-colors"
+                    className="px-2.5 py-1.5 rounded-md bg-white/[0.05] hover:bg-white/[0.09] text-xs text-zinc-200 font-medium flex items-center gap-1.5 border border-white/[0.08] transition-colors"
                   >
-                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                    <Check className="w-3.5 h-3.5 text-emerald-400" />
                     <span>{activeAnnotation.status === 'resolved' ? 'Reopen' : 'Resolve'}</span>
                   </button>
                   <button
                     onClick={() => handleConvertToTicket(activeAnnotation)}
-                    className="px-2.5 py-1.5 rounded-lg bg-indigo-600/20 hover:bg-indigo-600/30 text-xs text-indigo-300 border border-indigo-500/30 font-medium flex items-center gap-1.5 transition-colors"
+                    className="px-2.5 py-1.5 rounded-md bg-white/[0.05] hover:bg-white/[0.09] text-xs text-zinc-200 border border-white/[0.08] font-medium flex items-center gap-1.5 transition-colors"
                   >
                     <Ticket className="w-3.5 h-3.5" />
                     <span>Convert to Ticket</span>
@@ -516,35 +515,35 @@ export function ReviewStudio({
                 {activeAnnotation.comments?.map((c) => (
                   <div
                     key={c.id}
-                    className={`p-3 rounded-xl border text-xs ${
+                    className={`p-3 rounded-lg border text-xs ${
                       c.is_internal_only
-                        ? 'bg-amber-950/20 border-amber-500/30'
-                        : 'bg-slate-900 border-slate-800'
+                        ? 'bg-amber-500/[0.04] border-amber-500/20'
+                        : 'bg-white/[0.02] border-white/[0.06]'
                     }`}
                   >
-                    <div className="flex items-center justify-between text-slate-400 mb-1.5">
-                      <span className="font-semibold text-slate-200">
+                    <div className="flex items-center justify-between text-zinc-400 mb-1">
+                      <span className="font-semibold text-zinc-200">
                         {c.author?.full_name || 'Team Member'}
                       </span>
                       {c.is_internal_only && (
-                        <span className="flex items-center gap-1 text-[10px] text-amber-400 font-semibold">
+                        <span className="flex items-center gap-1 text-[10px] text-amber-400 font-mono">
                           <Lock className="w-2.5 h-2.5" /> Internal
                         </span>
                       )}
                     </div>
-                    <p className="text-slate-300 leading-relaxed">{c.content}</p>
+                    <p className="text-zinc-300 leading-relaxed">{c.content}</p>
                   </div>
                 ))}
               </div>
 
-              {/* Add Comment Input */}
-              <div className="p-3 border-t border-slate-800 bg-slate-950 space-y-2">
+              {/* Reply Box */}
+              <div className="p-3 border-t border-white/[0.07] bg-[#07080C] space-y-2">
                 <textarea
                   rows={2}
-                  placeholder="Reply to thread..."
+                  placeholder="Reply to feedback thread..."
                   value={commentContent}
                   onChange={(e) => setCommentContent(e.target.value)}
-                  className="w-full text-xs p-2.5 rounded-lg bg-slate-900 border border-slate-700 text-white focus:outline-none focus:border-indigo-500"
+                  className="w-full text-xs p-2 rounded-md bg-[#12141D] border border-white/[0.08] text-white focus:outline-none focus:border-zinc-400"
                 />
                 <div className="flex items-center justify-between">
                   {isAgencyStaff && (
@@ -553,14 +552,14 @@ export function ReviewStudio({
                         type="checkbox"
                         checked={isInternalComment}
                         onChange={(e) => setIsInternalComment(e.target.checked)}
-                        className="rounded border-slate-700 text-amber-500 focus:ring-0"
+                        className="rounded border-zinc-700 text-amber-500 focus:ring-0"
                       />
-                      <span className="text-[11px]">Internal Only</span>
+                      <span className="text-[11px] font-mono">Internal Only</span>
                     </label>
                   )}
                   <button
                     onClick={() => handleAddComment(activeAnnotation.id)}
-                    className="ml-auto px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold"
+                    className="ml-auto px-3 py-1.5 rounded-md bg-zinc-100 hover:bg-white text-zinc-950 text-xs font-semibold"
                   >
                     Reply
                   </button>
@@ -569,31 +568,31 @@ export function ReviewStudio({
             </div>
           ) : (
             /* Annotations List */
-            <div className="flex-1 overflow-y-auto divide-y divide-slate-800/80">
+            <div className="flex-1 overflow-y-auto divide-y divide-white/[0.05]">
               {filteredAnnotations.length === 0 ? (
-                <div className="p-8 text-center text-xs text-slate-500">
-                  No visual feedback pins found. Click "Add Pin Feedback" to drop a pin on the canvas.
+                <div className="p-8 text-center text-xs text-zinc-500 font-mono">
+                  No visual feedback pins found. Click "Drop Pin Feedback" above.
                 </div>
               ) : (
                 filteredAnnotations.map((anno) => (
                   <div
                     key={anno.id}
                     onClick={() => setActivePinId(anno.id)}
-                    className="p-4 hover:bg-slate-900/60 cursor-pointer transition-colors space-y-1.5"
+                    className="p-3.5 hover:bg-white/[0.03] cursor-pointer transition-colors space-y-1.5"
                   >
                     <div className="flex items-center justify-between">
-                      <span className="w-5 h-5 rounded-full bg-indigo-600 text-white text-[11px] font-bold flex items-center justify-center">
+                      <span className="w-5 h-5 rounded-full bg-zinc-800 text-zinc-200 border border-white/10 text-[11px] font-mono font-bold flex items-center justify-center">
                         {anno.pin_number}
                       </span>
-                      <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${
-                        anno.status === 'resolved' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-slate-800 text-slate-300'
+                      <span className={`text-[10px] font-mono px-1.5 py-0.2 rounded font-medium ${
+                        anno.status === 'resolved' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-white/[0.05] text-zinc-400'
                       }`}>
                         {anno.status}
                       </span>
                     </div>
-                    <h5 className="font-medium text-slate-200 text-xs line-clamp-1">{anno.title}</h5>
-                    <p className="text-slate-400 text-xs line-clamp-2">{anno.description}</p>
-                    <div className="flex items-center justify-between text-[11px] text-slate-500 pt-1">
+                    <h5 className="font-medium text-zinc-200 text-xs truncate">{anno.title}</h5>
+                    <p className="text-zinc-500 text-xs line-clamp-2 leading-relaxed">{anno.description}</p>
+                    <div className="flex items-center justify-between text-[11px] text-zinc-500 font-mono pt-1">
                       <span>{anno.author?.full_name || 'Client'}</span>
                       <span>{anno.comments?.length || 0} replies</span>
                     </div>
@@ -607,40 +606,40 @@ export function ReviewStudio({
 
       {/* Register Vercel Preview Modal */}
       {showDeployModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
-          <div className="bg-[#0E1524] border border-slate-700 rounded-2xl p-6 max-w-md w-full shadow-2xl space-y-4">
-            <h3 className="font-bold text-white text-base">Register Vercel Deployment</h3>
-            <p className="text-xs text-slate-400">
-              Securely register an approved staging deployment for client review. Must conform to approved Vercel host policies.
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-sm p-4">
+          <div className="bg-[#0E1017] border border-white/[0.1] rounded-xl p-6 max-w-md w-full shadow-2xl space-y-4">
+            <h3 className="font-semibold text-zinc-100 text-sm">Register Vercel Deployment</h3>
+            <p className="text-xs text-zinc-400">
+              Register an approved staging build for client review. Submissions must match allowed host policies.
             </p>
 
             {deployError && (
-              <div className="p-2.5 rounded-lg bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs">
+              <div className="p-2.5 rounded-md bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs">
                 {deployError}
               </div>
             )}
 
             <form onSubmit={handleRegisterVercelPreview} className="space-y-3">
               <div>
-                <label className="text-xs text-slate-300 block mb-1">Deployment URL (HTTPS)</label>
+                <label className="text-xs text-zinc-300 block mb-1">Deployment URL (HTTPS)</label>
                 <input
                   type="url"
                   required
                   placeholder="https://apex-preview.vercel.app"
                   value={newDeployUrl}
                   onChange={(e) => setNewDeployUrl(e.target.value)}
-                  className="w-full text-xs p-2.5 rounded-lg bg-slate-950 border border-slate-700 text-white focus:outline-none focus:border-indigo-500"
+                  className="w-full text-xs p-2.5 rounded-md bg-[#08090C] border border-white/[0.1] text-white focus:outline-none focus:border-zinc-400 font-mono"
                 />
               </div>
 
               <div>
-                <label className="text-xs text-slate-300 block mb-1">Git Branch</label>
+                <label className="text-xs text-zinc-300 block mb-1">Git Branch</label>
                 <input
                   type="text"
                   required
                   value={newDeployBranch}
                   onChange={(e) => setNewDeployBranch(e.target.value)}
-                  className="w-full text-xs p-2.5 rounded-lg bg-slate-950 border border-slate-700 text-white focus:outline-none focus:border-indigo-500"
+                  className="w-full text-xs p-2.5 rounded-md bg-[#08090C] border border-white/[0.1] text-white focus:outline-none focus:border-zinc-400 font-mono"
                 />
               </div>
 
@@ -648,15 +647,15 @@ export function ReviewStudio({
                 <button
                   type="button"
                   onClick={() => setShowDeployModal(false)}
-                  className="px-4 py-2 rounded-lg bg-slate-800 text-xs text-slate-300 hover:bg-slate-700"
+                  className="px-3.5 py-1.5 rounded-md bg-white/[0.06] text-xs text-zinc-300 hover:bg-white/[0.1]"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 rounded-lg bg-indigo-600 text-xs font-semibold text-white hover:bg-indigo-500"
+                  className="px-3.5 py-1.5 rounded-md bg-zinc-100 text-xs font-semibold text-zinc-950 hover:bg-white"
                 >
-                  Verify & Register
+                  Register
                 </button>
               </div>
             </form>

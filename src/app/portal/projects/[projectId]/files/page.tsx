@@ -37,47 +37,55 @@ export default function ClientFilesPage({
       <ProjectHeaderTabs project={project} basePath="/portal/projects" />
 
       <div className="p-6 md:p-8 max-w-7xl mx-auto w-full space-y-6">
-        <div>
-          <h2 className="text-xl font-bold text-white tracking-tight">Project Shared Files</h2>
-          <p className="text-xs text-slate-400 mt-1">
-            Official project specifications, design tokens, architecture schematics, and deliverables.
+        <div className="border-b border-white/[0.06] pb-5">
+          <div className="flex items-center gap-2 text-xs font-mono text-zinc-500 mb-1">
+            <span>VAULT</span>
+            <span>/</span>
+            <span className="text-zinc-300">PROJECT DELIVERABLES</span>
+          </div>
+          <h2 className="text-xl font-semibold text-zinc-100 tracking-tight">Project Artifacts & Shared Files</h2>
+          <p className="text-xs text-zinc-400 mt-0.5">
+            Architecture specifications, contracts, and export bundles signed by the engineering team.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5">
           {files.map((file) => (
             <div
               key={file.id}
-              className="p-5 rounded-2xl glass-panel border border-slate-800 hover:border-purple-500/30 transition-all space-y-3"
+              className="p-4 rounded-lg bg-[#0E1017] border border-white/[0.07] hover:border-white/[0.14] transition-all space-y-3 flex flex-col justify-between"
             >
-              <div className="flex items-start justify-between">
-                <div className="p-2.5 rounded-xl bg-purple-500/10 text-purple-400">
-                  {file.mime_type.includes('pdf') ? (
-                    <FileText className="w-5 h-5" />
-                  ) : file.mime_type.includes('image') ? (
-                    <Image className="w-5 h-5" />
-                  ) : (
-                    <FileCode className="w-5 h-5" />
-                  )}
+              <div className="space-y-2.5">
+                <div className="flex items-start justify-between">
+                  <div className="p-2 rounded-md bg-white/[0.04] border border-white/[0.06] text-zinc-300">
+                    {file.mime_type.includes('pdf') ? (
+                      <FileText className="w-4 h-4" />
+                    ) : file.mime_type.includes('image') ? (
+                      <Image className="w-4 h-4" />
+                    ) : (
+                      <FileCode className="w-4 h-4" />
+                    )}
+                  </div>
+                  <span className="text-[10px] text-zinc-500 uppercase font-mono tracking-wider">{file.category}</span>
                 </div>
-                <span className="text-[10px] text-purple-400 uppercase font-mono">{file.category}</span>
+
+                <div>
+                  <h4 className="font-medium text-zinc-100 text-xs line-clamp-1">{file.file_name}</h4>
+                  <p className="text-[11px] text-zinc-500 font-mono mt-0.5">{formatBytes(file.file_size)}</p>
+                </div>
               </div>
 
-              <div>
-                <h4 className="font-semibold text-white text-xs line-clamp-1">{file.file_name}</h4>
-                <p className="text-[11px] text-slate-500 mt-0.5">{formatBytes(file.file_size)}</p>
-              </div>
-
-              <div className="pt-2 border-t border-slate-800/80 flex items-center justify-between text-xs">
-                <span className="text-[11px] text-slate-500">
+              <div className="pt-2.5 border-t border-white/[0.05] flex items-center justify-between text-xs">
+                <span className="text-[11px] text-zinc-500 font-mono">
                   {new Date(file.created_at).toLocaleDateString()}
                 </span>
                 <button
                   onClick={() => alert(`Downloading verified file: ${file.file_name}`)}
-                  className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+                  className="btn-secondary py-1 px-2"
                   title="Download File"
                 >
-                  <Download className="w-4 h-4" />
+                  <Download className="w-3 h-3 text-zinc-400" />
+                  <span className="text-[11px]">Download</span>
                 </button>
               </div>
             </div>

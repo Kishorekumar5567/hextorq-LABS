@@ -1,44 +1,58 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useAuth } from '@/lib/auth/auth-context';
-import { Shield, User, Users, CheckCircle, ArrowRight } from 'lucide-react';
+import { Shield, ArrowRight, Check } from 'lucide-react';
 import Link from 'next/link';
 
 export function RoleSwitcherBar() {
-  const { currentUser, availableUsers, switchUser, isAgencyStaff, isClient } = useAuth();
+  const { currentUser, availableUsers, switchUser, isAgencyStaff } = useAuth();
+
+  // Keyboard shortcut listener for fast switching (Alt+1, Alt+2, etc.)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.altKey && ['1', '2', '3', '4'].includes(e.key)) {
+        const index = parseInt(e.key, 10) - 1;
+        if (availableUsers[index]) {
+          switchUser(availableUsers[index].id);
+        }
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [availableUsers, switchUser]);
 
   return (
-    <div className="bg-[#0B101E] border-b border-indigo-500/20 px-4 py-2 text-xs flex flex-wrap items-center justify-between gap-3 shadow-sm z-50">
-      <div className="flex items-center gap-2">
-        <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-indigo-500/10 text-indigo-400 font-medium border border-indigo-500/20">
-          <Shield className="w-3.5 h-3.5" />
-          <span>Interactive Persona Sandbox</span>
+    <div className="bg-[#0B0D13] border-b border-white/[0.07] px-4 py-1.5 text-xs flex flex-wrap items-center justify-between gap-3 shrink-0 z-50 select-none">
+      <div className="flex items-center gap-3">
+        <div className="flex items-center gap-1.5 font-mono text-[11px] text-zinc-400">
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+          <span className="tracking-wide">SIMULATED SESSION</span>
         </div>
-        <span className="text-slate-400 hidden sm:inline">
-          Test multi-tenant RLS isolation in real-time:
+        <span className="text-zinc-600 hidden md:inline">|</span>
+        <span className="text-zinc-500 text-[11px] hidden md:inline">
+          Switch persona to verify multi-tenant data boundaries:
         </span>
       </div>
 
-      <div className="flex items-center gap-2 overflow-x-auto py-0.5">
-        {availableUsers.map((u) => {
+      <div className="flex items-center gap-1 bg-[#131620] p-0.5 rounded-lg border border-white/[0.06]">
+        {availableUsers.map((u, i) => {
           const isActive = u.id === currentUser.id;
           return (
             <button
               key={u.id}
               onClick={() => switchUser(u.id)}
-              className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md transition-all font-medium ${
+              className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-medium transition-all ${
                 isActive
-                  ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30'
-                  : 'bg-slate-800/80 text-slate-300 hover:bg-slate-700/80 hover:text-white border border-slate-700/50'
+                  ? 'bg-zinc-100 text-zinc-950 font-semibold shadow-xs'
+                  : 'text-zinc-400 hover:text-zinc-200 hover:bg-white/[0.04]'
               }`}
             >
-              {isActive && <CheckCircle className="w-3 h-3 text-emerald-300" />}
               <span>{u.full_name}</span>
-              <span className={`text-[10px] px-1 py-0.2 rounded ${
-                u.role === 'agency_admin' ? 'bg-amber-500/20 text-amber-300' :
-                u.role === 'agency_developer' ? 'bg-cyan-500/20 text-cyan-300' :
-                'bg-purple-500/20 text-purple-300'
+              <span className={`text-[9px] px-1 py-0.2 rounded font-mono uppercase ${
+                isActive
+                  ? 'bg-zinc-300 text-zinc-800'
+                  : 'bg-white/[0.06] text-zinc-400'
               }`}>
                 {u.role === 'agency_admin' ? 'Admin' : u.role === 'agency_developer' ? 'Dev' : 'Client'}
               </span>
@@ -47,21 +61,21 @@ export function RoleSwitcherBar() {
         })}
       </div>
 
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-3 text-[11px]">
         {isAgencyStaff ? (
           <Link
             href="/agency/dashboard"
-            className="flex items-center gap-1 text-indigo-400 hover:text-indigo-300 font-medium transition-colors"
+            className="flex items-center gap-1 text-zinc-400 hover:text-zinc-100 font-medium transition-colors"
           >
-            <span>Agency Workspace</span>
+            <span>Agency Operations</span>
             <ArrowRight className="w-3 h-3" />
           </Link>
         ) : (
           <Link
             href="/portal/dashboard"
-            className="flex items-center gap-1 text-purple-400 hover:text-purple-300 font-medium transition-colors"
+            className="flex items-center gap-1 text-zinc-400 hover:text-zinc-100 font-medium transition-colors"
           >
-            <span>Client Portal</span>
+            <span>Client Workspace</span>
             <ArrowRight className="w-3 h-3" />
           </Link>
         )}
