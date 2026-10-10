@@ -12,13 +12,12 @@ import {
   Check,
   Lock,
   ExternalLink,
-  GitBranch,
-  ShieldCheck,
   Ticket,
-  SlidersHorizontal,
-  ChevronRight,
-  MessageSquare,
-  CornerDownLeft,
+  RotateCw,
+  Sparkles,
+  Layers,
+  MousePointer,
+  HelpCircle,
 } from 'lucide-react';
 
 export function ReviewStudio({
@@ -36,6 +35,8 @@ export function ReviewStudio({
   const [activePinId, setActivePinId] = useState<string | null>(null);
   const [annotations, setAnnotations] = useState<VisualAnnotation[]>(initialAnnotations);
   const [statusFilter, setStatusFilter] = useState<'all' | 'open' | 'resolved'>('all');
+  const [iframeKey, setIframeKey] = useState<number>(1);
+  const [isIframeLoading, setIsIframeLoading] = useState(true);
 
   // New pin draft state
   const [draftPin, setDraftPin] = useState<{
@@ -58,11 +59,21 @@ export function ReviewStudio({
 
   const canvasRef = useRef<HTMLDivElement>(null);
 
+  // Active target deployment URL (defaults to live Vercel deployment)
+  const targetUrl = initialPreview?.deployment_url || 'https://harry-clinton.vercel.app';
+  const proxyUrl = `/api/proxy-preview?url=${encodeURIComponent(targetUrl)}`;
+
   // Viewport sizes
   const viewportStyles = {
     desktop: 'w-full max-w-[1240px]',
     tablet: 'w-[768px]',
     mobile: 'w-[375px]',
+  };
+
+  const viewportDimensions = {
+    desktop: '1440 × 900',
+    tablet: '768 × 1024',
+    mobile: '375 × 812',
   };
 
   const handleCanvasClick = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -88,12 +99,12 @@ export function ReviewStudio({
     try {
       const newAnno = db.createAnnotation(project.id, currentUser, {
         preview_id: initialPreview?.id || 'prev-apex-01',
-        page_path: '/checkout',
+        page_path: '/',
         viewport_width: viewport === 'desktop' ? 1440 : viewport === 'tablet' ? 768 : 375,
         viewport_height: 900,
         position_x: draftPin.x,
         position_y: draftPin.y,
-        element_selector: '#interactive-preview-canvas',
+        element_selector: '#live-preview-viewport',
         title: draftPin.title,
         description: draftPin.description,
         priority: draftPin.priority,
@@ -129,7 +140,7 @@ export function ReviewStudio({
         description: anno.description,
         priority: anno.priority,
         is_client_visible: true,
-        tags: ['visual-feedback', 'review-studio'],
+        tags: ['visual-feedback', 'review-studio', 'live-vercel'],
       });
       alert(`Created Ticket #${ticket.ticket_number} successfully!`);
     } catch (err: any) {
@@ -191,7 +202,9 @@ export function ReviewStudio({
             <button
               onClick={() => setViewport('desktop')}
               className={`px-2.5 py-1 rounded text-xs font-medium flex items-center gap-1.5 transition-all ${
-                viewport === 'desktop' ? 'bg-zinc-100 text-zinc-950 font-semibold shadow-xs' : 'text-zinc-400 hover:text-zinc-200'
+                viewport === 'desktop'
+                  ? 'bg-zinc-100 text-zinc-950 font-semibold shadow-xs'
+                  : 'text-zinc-400 hover:text-zinc-200'
               }`}
             >
               <Monitor className="w-3.5 h-3.5" />
@@ -200,7 +213,9 @@ export function ReviewStudio({
             <button
               onClick={() => setViewport('tablet')}
               className={`px-2.5 py-1 rounded text-xs font-medium flex items-center gap-1.5 transition-all ${
-                viewport === 'tablet' ? 'bg-zinc-100 text-zinc-950 font-semibold shadow-xs' : 'text-zinc-400 hover:text-zinc-200'
+                viewport === 'tablet'
+                  ? 'bg-zinc-100 text-zinc-950 font-semibold shadow-xs'
+                  : 'text-zinc-400 hover:text-zinc-200'
               }`}
             >
               <Tablet className="w-3.5 h-3.5" />
@@ -209,7 +224,9 @@ export function ReviewStudio({
             <button
               onClick={() => setViewport('mobile')}
               className={`px-2.5 py-1 rounded text-xs font-medium flex items-center gap-1.5 transition-all ${
-                viewport === 'mobile' ? 'bg-zinc-100 text-zinc-950 font-semibold shadow-xs' : 'text-zinc-400 hover:text-zinc-200'
+                viewport === 'mobile'
+                  ? 'bg-zinc-100 text-zinc-950 font-semibold shadow-xs'
+                  : 'text-zinc-400 hover:text-zinc-200'
               }`}
             >
               <Smartphone className="w-3.5 h-3.5" />
@@ -217,37 +234,47 @@ export function ReviewStudio({
             </button>
           </div>
 
+          {/* Mode Selector */}
           <button
             onClick={() => setIsAddMode(!isAddMode)}
             className={`px-3 py-1.5 rounded-lg text-xs font-medium flex items-center gap-1.5 transition-all border ${
               isAddMode
-                ? 'bg-amber-400 text-zinc-950 font-bold border-amber-300 shadow-xs'
+                ? 'bg-amber-400 text-zinc-950 font-bold border-amber-300 shadow-md animate-pulse'
                 : 'bg-white/[0.04] text-zinc-300 hover:bg-white/[0.08] border-white/[0.08]'
             }`}
           >
-            <Plus className="w-3.5 h-3.5" />
-            <span>{isAddMode ? 'Click Canvas to Pin...' : 'Drop Pin Feedback'}</span>
+            {isAddMode ? <MousePointer className="w-3.5 h-3.5" /> : <Plus className="w-3.5 h-3.5" />}
+            <span>{isAddMode ? 'Click Anywhere on Page to Pin...' : 'Drop Pin Feedback'}</span>
+          </button>
+
+          {/* Reload Preview Button */}
+          <button
+            onClick={() => {
+              setIsIframeLoading(true);
+              setIframeKey((prev) => prev + 1);
+            }}
+            title="Reload live deployment frame"
+            className="p-1.5 rounded-lg bg-white/[0.04] hover:bg-white/[0.08] text-zinc-400 hover:text-zinc-100 border border-white/[0.08] transition-colors"
+          >
+            <RotateCw className={`w-3.5 h-3.5 ${isIframeLoading ? 'animate-spin text-zinc-200' : ''}`} />
           </button>
         </div>
 
-        {/* Deployment Header */}
+        {/* Live Vercel Status Bar */}
         <div className="flex items-center gap-3">
-          {initialPreview ? (
-            <div className="flex items-center gap-2 text-xs bg-white/[0.03] px-2.5 py-1 rounded-md border border-white/[0.06] text-zinc-400 font-mono">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-              <span>{initialPreview.git_branch}</span>
-              <a
-                href={initialPreview.deployment_url}
-                target="_blank"
-                rel="noreferrer"
-                className="text-zinc-300 hover:text-white flex items-center gap-1 ml-1"
-              >
-                <ExternalLink className="w-3 h-3" />
-              </a>
-            </div>
-          ) : (
-            <span className="text-xs text-amber-400 font-mono">No preview</span>
-          )}
+          <div className="flex items-center gap-2 text-xs bg-emerald-500/[0.08] border border-emerald-500/20 px-2.5 py-1 rounded-md text-emerald-400 font-mono">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+            <span className="hidden sm:inline">Vercel Edge Ready · 200 OK</span>
+            <a
+              href={targetUrl}
+              target="_blank"
+              rel="noreferrer"
+              title="Open live site in new tab"
+              className="text-emerald-300 hover:text-white flex items-center gap-1 ml-1"
+            >
+              <ExternalLink className="w-3 h-3" />
+            </a>
+          </div>
 
           {isAgencyStaff && (
             <button
@@ -267,130 +294,120 @@ export function ReviewStudio({
           <div
             ref={canvasRef}
             onClick={handleCanvasClick}
-            className={`${viewportStyles[viewport]} min-h-[640px] rounded-xl border border-white/[0.08] bg-[#0E1017] shadow-2xl relative transition-all duration-200 overflow-hidden ${
-              isAddMode ? 'cursor-crosshair ring-1 ring-amber-400/50' : 'cursor-default'
+            className={`${viewportStyles[viewport]} h-[760px] rounded-xl border border-white/[0.08] bg-[#0E1017] shadow-2xl relative transition-all duration-200 flex flex-col overflow-hidden ${
+              isAddMode ? 'cursor-crosshair ring-2 ring-amber-400/60 shadow-amber-500/10' : 'cursor-default'
             }`}
           >
             {/* Minimalist Browser Frame Bar */}
-            <div className="border-b border-white/[0.07] bg-[#12141D] px-3.5 py-2 flex items-center justify-between text-xs text-zinc-400 font-mono">
+            <div className="border-b border-white/[0.07] bg-[#12141D] px-3.5 py-2 flex items-center justify-between text-xs text-zinc-400 font-mono shrink-0">
               <div className="flex items-center gap-2">
                 <div className="flex items-center gap-1.5">
-                  <div className="w-2.5 h-2.5 rounded-full bg-zinc-700" />
-                  <div className="w-2.5 h-2.5 rounded-full bg-zinc-700" />
-                  <div className="w-2.5 h-2.5 rounded-full bg-zinc-700" />
+                  <div className="w-2.5 h-2.5 rounded-full bg-rose-500/80" />
+                  <div className="w-2.5 h-2.5 rounded-full bg-amber-500/80" />
+                  <div className="w-2.5 h-2.5 rounded-full bg-emerald-500/80" />
                 </div>
                 <div className="bg-[#090A0E] px-3 py-1 rounded text-[11px] text-zinc-300 border border-white/[0.05] ml-2 flex items-center gap-1.5">
-                  <Lock className="w-2.5 h-2.5 text-zinc-500" />
-                  <span>{initialPreview ? initialPreview.deployment_url : 'https://apex-preview.vercel.app/checkout'}</span>
+                  <Lock className="w-2.5 h-2.5 text-emerald-400" />
+                  <span className="truncate max-w-[320px]">{targetUrl}</span>
                 </div>
               </div>
-              <span className="text-[10px] text-zinc-500">STAGING PREVIEW</span>
-            </div>
 
-            {/* Rendered Staging Webpage (Apex Checkout 2.0) */}
-            <div className="p-8 space-y-6 text-zinc-100 max-w-2xl mx-auto">
-              <div className="space-y-1">
-                <span className="text-[11px] font-mono text-zinc-400 uppercase tracking-wider">
-                  Apex Global · Checkout v2.4
+              <div className="flex items-center gap-3">
+                <span className="text-[10px] text-zinc-500 font-mono">{viewportDimensions[viewport]}</span>
+                <span className="text-[10px] px-1.5 py-0.5 rounded bg-white/[0.06] text-zinc-300 font-mono uppercase">
+                  LIVE VERCEL
                 </span>
-                <h2 className="text-xl font-bold tracking-tight text-white">
-                  Payment Authorization & Review
-                </h2>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
-                <div className="p-3.5 rounded-lg bg-zinc-900/60 border border-white/[0.06] space-y-2">
-                  <span className="font-semibold text-zinc-300 uppercase tracking-wide text-[10px]">Order Summary</span>
-                  <div className="flex justify-between text-zinc-300">
-                    <span>Pro Wireless Earbuds</span>
-                    <span className="font-semibold text-white">$189.00</span>
-                  </div>
-                  <div className="flex justify-between text-zinc-300">
-                    <span>Travel Case Midnight</span>
-                    <span className="font-semibold text-white">$45.00</span>
-                  </div>
-                </div>
-
-                <div className="p-3.5 rounded-lg bg-zinc-900/60 border border-white/[0.06] space-y-2">
-                  <span className="font-semibold text-zinc-300 uppercase tracking-wide text-[10px]">Taxes & Total</span>
-                  <div className="flex justify-between text-zinc-400">
-                    <span>Subtotal</span>
-                    <span>$234.00</span>
-                  </div>
-                  <div className="flex justify-between text-zinc-400">
-                    <span>Estimated VAT (20%)</span>
-                    <span>$46.80</span>
-                  </div>
-                  <div className="border-t border-white/[0.06] pt-1.5 flex justify-between font-bold text-white">
-                    <span>Total Due</span>
-                    <span>$280.80 USD</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* The element annotated with pin #1 */}
-              <div id="interactive-preview-canvas" className="p-4 rounded-xl bg-zinc-900/40 border border-white/[0.06]">
-                <button className="w-full py-3 px-4 rounded-lg bg-zinc-100 hover:bg-white text-zinc-950 font-semibold text-xs shadow-xs transition-all flex items-center justify-center gap-2">
-                  <ShieldCheck className="w-4 h-4" />
-                  <span>Authorize Payment & Confirm Order</span>
-                </button>
-                <p className="text-[11px] text-center text-zinc-500 mt-2 font-mono">
-                  Encrypted checkout via Stripe & Hextorq Cloud.
-                </p>
               </div>
             </div>
 
-            {/* Visual Feedback Pins Placed on Canvas */}
-            {annotations.map((anno) => {
-              const isResolved = anno.status === 'resolved';
-              const isSelected = activePinId === anno.id;
-              return (
-                <div
-                  key={anno.id}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setActivePinId(anno.id);
-                  }}
-                  style={{
-                    left: `${anno.position_x}%`,
-                    top: `${anno.position_y}%`,
-                  }}
-                  className={`absolute -translate-x-1/2 -translate-y-1/2 cursor-pointer z-20 group transition-all transform ${
-                    isSelected ? 'scale-110' : 'hover:scale-105'
-                  }`}
-                >
+            {/* Frame Viewport & Interactive Layer */}
+            <div className="relative flex-1 bg-black overflow-hidden">
+              {/* Live Webpage via Secure Proxy */}
+              <iframe
+                key={iframeKey}
+                src={proxyUrl}
+                title="Harry Clinton Bespoke Menswear - Live Vercel Staging"
+                onLoad={() => setIsIframeLoading(false)}
+                className={`w-full h-full border-0 bg-neutral-950 transition-opacity duration-300 ${
+                  isIframeLoading ? 'opacity-40' : 'opacity-100'
+                }`}
+                sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
+              />
+
+              {/* Loading Shimmer */}
+              {isIframeLoading && (
+                <div className="absolute inset-0 flex items-center justify-center bg-black/60 pointer-events-none">
+                  <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-zinc-900 border border-white/10 text-xs text-zinc-300 font-mono">
+                    <RotateCw className="w-3.5 h-3.5 animate-spin text-zinc-400" />
+                    <span>Streaming live deployment...</span>
+                  </div>
+                </div>
+              )}
+
+              {/* Click Interception Layer when Pin Mode is Active */}
+              {isAddMode && (
+                <div className="absolute inset-0 z-20 cursor-crosshair bg-amber-500/[0.05] border-2 border-dashed border-amber-400/40 flex items-start justify-center pt-3 pointer-events-none">
+                  <div className="px-3 py-1 rounded-full bg-amber-400 text-zinc-950 text-xs font-bold shadow-lg flex items-center gap-1.5">
+                    <MousePointer className="w-3 h-3" />
+                    <span>Click anywhere on the preview to place pin</span>
+                  </div>
+                </div>
+              )}
+
+              {/* Visual Feedback Pins Placed on Canvas */}
+              {annotations.map((anno) => {
+                const isResolved = anno.status === 'resolved';
+                const isSelected = activePinId === anno.id;
+                return (
                   <div
-                    className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-mono font-bold shadow-lg border transition-all ${
-                      isResolved
-                        ? 'bg-zinc-800 text-zinc-400 border-zinc-700'
-                        : isSelected
-                        ? 'bg-zinc-100 text-zinc-950 border-white ring-4 ring-white/15'
-                        : 'bg-zinc-900 text-white border-white/20'
+                    key={anno.id}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setActivePinId(anno.id);
+                    }}
+                    style={{
+                      left: `${anno.position_x}%`,
+                      top: `${anno.position_y}%`,
+                    }}
+                    className={`absolute -translate-x-1/2 -translate-y-1/2 cursor-pointer z-30 group transition-all transform pointer-events-auto ${
+                      isSelected ? 'scale-115' : 'hover:scale-105'
                     }`}
                   >
-                    {anno.pin_number}
-                  </div>
+                    <div
+                      className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-mono font-bold shadow-2xl border transition-all ${
+                        isResolved
+                          ? 'bg-zinc-800 text-zinc-400 border-zinc-700'
+                          : isSelected
+                          ? 'bg-amber-400 text-zinc-950 border-white ring-4 ring-amber-400/30'
+                          : 'bg-zinc-900 text-white border-white/30 hover:border-white'
+                      }`}
+                    >
+                      {anno.pin_number}
+                    </div>
 
-                  {/* Micro Tooltip on Hover */}
-                  <div className="absolute left-1/2 -translate-x-1/2 top-full mt-2 hidden group-hover:block z-30 w-48 p-2 rounded-lg bg-[#0E1017] border border-white/[0.1] text-zinc-200 text-xs shadow-xl pointer-events-none">
-                    <p className="font-semibold text-zinc-100 truncate">{anno.title}</p>
-                    <p className="text-[10px] text-zinc-400 font-mono mt-0.5 uppercase">{anno.priority} · {anno.status}</p>
+                    {/* Micro Tooltip on Hover */}
+                    <div className="absolute left-1/2 -translate-x-1/2 top-full mt-2 hidden group-hover:block z-40 w-48 p-2 rounded-lg bg-[#0E1017] border border-white/[0.1] text-zinc-200 text-xs shadow-2xl pointer-events-none">
+                      <p className="font-semibold text-zinc-100 truncate">{anno.title}</p>
+                      <p className="text-[10px] text-zinc-400 font-mono mt-0.5 uppercase">
+                        {anno.priority} · {anno.status}
+                      </p>
+                    </div>
+                  </div>
+                );
+              })}
+
+              {/* Draft Marker */}
+              {draftPin && (
+                <div
+                  style={{ left: `${draftPin.x}%`, top: `${draftPin.y}%` }}
+                  className="absolute -translate-x-1/2 -translate-y-1/2 z-40 pointer-events-none"
+                >
+                  <div className="w-8 h-8 rounded-full bg-amber-400 text-zinc-950 font-bold flex items-center justify-center text-sm border-2 border-white animate-pulse shadow-2xl font-mono">
+                    +
                   </div>
                 </div>
-              );
-            })}
-
-            {/* Draft Marker */}
-            {draftPin && (
-              <div
-                style={{ left: `${draftPin.x}%`, top: `${draftPin.y}%` }}
-                className="absolute -translate-x-1/2 -translate-y-1/2 z-30"
-              >
-                <div className="w-7 h-7 rounded-full bg-amber-400 text-zinc-950 font-bold flex items-center justify-center text-xs border border-white animate-pulse shadow-lg font-mono">
-                  +
-                </div>
-              </div>
-            )}
+              )}
+            </div>
           </div>
         </div>
 
@@ -401,19 +418,25 @@ export function ReviewStudio({
             <div className="flex items-center gap-1 text-[11px] bg-white/[0.04] p-0.5 rounded-md border border-white/[0.06]">
               <button
                 onClick={() => setStatusFilter('all')}
-                className={`px-2 py-0.5 rounded ${statusFilter === 'all' ? 'bg-zinc-700 text-white font-medium' : 'text-zinc-400'}`}
+                className={`px-2 py-0.5 rounded ${
+                  statusFilter === 'all' ? 'bg-zinc-700 text-white font-medium' : 'text-zinc-400'
+                }`}
               >
                 All
               </button>
               <button
                 onClick={() => setStatusFilter('open')}
-                className={`px-2 py-0.5 rounded ${statusFilter === 'open' ? 'bg-zinc-700 text-white font-medium' : 'text-zinc-400'}`}
+                className={`px-2 py-0.5 rounded ${
+                  statusFilter === 'open' ? 'bg-zinc-700 text-white font-medium' : 'text-zinc-400'
+                }`}
               >
                 Open
               </button>
               <button
                 onClick={() => setStatusFilter('resolved')}
-                className={`px-2 py-0.5 rounded ${statusFilter === 'resolved' ? 'bg-zinc-700 text-white font-medium' : 'text-zinc-400'}`}
+                className={`px-2 py-0.5 rounded ${
+                  statusFilter === 'resolved' ? 'bg-zinc-700 text-white font-medium' : 'text-zinc-400'
+                }`}
               >
                 Resolved
               </button>
@@ -475,9 +498,13 @@ export function ReviewStudio({
                   >
                     ← All issues
                   </button>
-                  <span className={`text-[10px] font-mono px-2 py-0.5 rounded font-bold uppercase ${
-                    activeAnnotation.status === 'resolved' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-white/[0.06] text-zinc-300'
-                  }`}>
+                  <span
+                    className={`text-[10px] font-mono px-2 py-0.5 rounded font-bold uppercase ${
+                      activeAnnotation.status === 'resolved'
+                        ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
+                        : 'bg-white/[0.06] text-zinc-300'
+                    }`}
+                  >
                     {activeAnnotation.status}
                   </span>
                 </div>
@@ -486,9 +513,7 @@ export function ReviewStudio({
                   <h4 className="font-semibold text-zinc-100 text-xs">
                     Pin #{activeAnnotation.pin_number}: {activeAnnotation.title}
                   </h4>
-                  <p className="text-xs text-zinc-400 mt-1 leading-relaxed">
-                    {activeAnnotation.description}
-                  </p>
+                  <p className="text-xs text-zinc-400 mt-1 leading-relaxed">{activeAnnotation.description}</p>
                 </div>
 
                 {/* Actions */}
@@ -584,9 +609,13 @@ export function ReviewStudio({
                       <span className="w-5 h-5 rounded-full bg-zinc-800 text-zinc-200 border border-white/10 text-[11px] font-mono font-bold flex items-center justify-center">
                         {anno.pin_number}
                       </span>
-                      <span className={`text-[10px] font-mono px-1.5 py-0.2 rounded font-medium ${
-                        anno.status === 'resolved' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-white/[0.05] text-zinc-400'
-                      }`}>
+                      <span
+                        className={`text-[10px] font-mono px-1.5 py-0.2 rounded font-medium ${
+                          anno.status === 'resolved'
+                            ? 'bg-emerald-500/10 text-emerald-400'
+                            : 'bg-white/[0.05] text-zinc-400'
+                        }`}
+                      >
                         {anno.status}
                       </span>
                     </div>
@@ -625,7 +654,7 @@ export function ReviewStudio({
                 <input
                   type="url"
                   required
-                  placeholder="https://apex-preview.vercel.app"
+                  placeholder="https://harry-clinton.vercel.app"
                   value={newDeployUrl}
                   onChange={(e) => setNewDeployUrl(e.target.value)}
                   className="w-full text-xs p-2.5 rounded-md bg-[#08090C] border border-white/[0.1] text-white focus:outline-none focus:border-zinc-400 font-mono"
