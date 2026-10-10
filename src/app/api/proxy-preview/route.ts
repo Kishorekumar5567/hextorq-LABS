@@ -74,6 +74,11 @@ export async function GET(req: NextRequest) {
       html = `<head>${baseTag}</head>${html}`;
     }
 
+    // Rewrite root-relative URLs in HTML attributes so that assets resolve directly against target origin
+    html = html.replace(/(src|href|poster)=["']\/([^"'\/][^"']*)["']/gi, (match, attr, path) => {
+      return `${attr}="${origin}/${path}"`;
+    });
+
     // Strip any meta tags that set frame-ancestors
     html = html.replace(/<meta[^>]*http-equiv=["']Content-Security-Policy["'][^>]*>/gi, '');
 

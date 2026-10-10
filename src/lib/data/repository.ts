@@ -295,6 +295,25 @@ class RepositoryStore {
     return newComment;
   }
 
+  deleteAnnotation(annotationId: string, user: UserProfile): boolean {
+    const annoIndex = this.annotations.findIndex(a => a.id === annotationId);
+    if (annoIndex === -1) throw new Error('Annotation not found');
+    const anno = this.annotations[annoIndex];
+    this.verifyProjectAccess(anno.project_id, user);
+
+    this.annotations.splice(annoIndex, 1);
+    this.recordActivity(
+      anno.project_id,
+      user.id,
+      'annotation',
+      anno.id,
+      'removed_visual_feedback',
+      { pin_number: anno.pin_number, title: anno.title },
+      true
+    );
+    return true;
+  }
+
   // Tickets
   getTickets(projectId: string, user: UserProfile): Ticket[] {
     this.verifyProjectAccess(projectId, user);

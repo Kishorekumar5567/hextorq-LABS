@@ -18,6 +18,7 @@ import {
   Layers,
   MousePointer,
   HelpCircle,
+  Trash2,
 } from 'lucide-react';
 
 export function ReviewStudio({
@@ -154,6 +155,24 @@ export function ReviewStudio({
     setAnnotations([...annotations]);
   };
 
+  const handleDeleteAnnotation = (anno: VisualAnnotation) => {
+    const confirmDelete = window.confirm(
+      `Are you sure you want to remove Review Pin #${anno.pin_number}: "${anno.title}"?`
+    );
+    if (!confirmDelete) return;
+
+    try {
+      db.deleteAnnotation(anno.id, currentUser);
+      const updated = db.getVisualAnnotations(project.id, currentUser);
+      setAnnotations(updated);
+      if (activePinId === anno.id) {
+        setActivePinId(null);
+      }
+    } catch (err: any) {
+      alert(err.message);
+    }
+  };
+
   const handleRegisterVercelPreview = async (e: React.FormEvent) => {
     e.preventDefault();
     setDeployError('');
@@ -193,7 +212,7 @@ export function ReviewStudio({
   const activeAnnotation = annotations.find((a) => a.id === activePinId);
 
   return (
-    <div className="flex flex-col h-[calc(100vh-125px)] bg-[#07080C] overflow-hidden select-none">
+    <div className="flex-1 flex flex-col min-h-0 bg-[#07080C] overflow-hidden select-none">
       {/* Studio Precision Toolbar */}
       <div className="border-b border-white/[0.07] bg-[#0A0B10] px-4 py-2 flex items-center justify-between gap-4 shrink-0">
         <div className="flex items-center gap-3">
@@ -288,13 +307,13 @@ export function ReviewStudio({
       </div>
 
       {/* Main Studio Workspace */}
-      <div className="flex-1 flex overflow-hidden">
+      <div className="flex-1 flex min-h-0 overflow-hidden">
         {/* Canvas Area */}
-        <div className="flex-1 bg-[#050608] overflow-auto flex items-center justify-center p-6 relative">
+        <div className="flex-1 bg-[#050608] min-h-0 overflow-auto flex items-center justify-center p-4 relative">
           <div
             ref={canvasRef}
             onClick={handleCanvasClick}
-            className={`${viewportStyles[viewport]} h-[760px] rounded-xl border border-white/[0.08] bg-[#0E1017] shadow-2xl relative transition-all duration-200 flex flex-col overflow-hidden ${
+            className={`${viewportStyles[viewport]} h-full max-h-[calc(100vh-230px)] min-h-[520px] rounded-xl border border-white/[0.08] bg-[#0E1017] shadow-2xl relative transition-all duration-200 flex flex-col overflow-hidden ${
               isAddMode ? 'cursor-crosshair ring-2 ring-amber-400/60 shadow-amber-500/10' : 'cursor-default'
             }`}
           >
@@ -532,6 +551,14 @@ export function ReviewStudio({
                     <Ticket className="w-3.5 h-3.5" />
                     <span>Convert to Ticket</span>
                   </button>
+                  <button
+                    onClick={() => handleDeleteAnnotation(activeAnnotation)}
+                    className="px-2.5 py-1.5 rounded-md bg-rose-500/10 hover:bg-rose-500/20 text-xs text-rose-300 hover:text-rose-200 border border-rose-500/20 font-medium flex items-center gap-1.5 transition-colors ml-auto"
+                    title="Remove this review pin"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                    <span>Remove Pin</span>
+                  </button>
                 </div>
               </div>
 
@@ -609,15 +636,27 @@ export function ReviewStudio({
                       <span className="w-5 h-5 rounded-full bg-zinc-800 text-zinc-200 border border-white/10 text-[11px] font-mono font-bold flex items-center justify-center">
                         {anno.pin_number}
                       </span>
-                      <span
-                        className={`text-[10px] font-mono px-1.5 py-0.2 rounded font-medium ${
-                          anno.status === 'resolved'
-                            ? 'bg-emerald-500/10 text-emerald-400'
-                            : 'bg-white/[0.05] text-zinc-400'
-                        }`}
-                      >
-                        {anno.status}
-                      </span>
+                      <div className="flex items-center gap-1.5">
+                        <span
+                          className={`text-[10px] font-mono px-1.5 py-0.2 rounded font-medium ${
+                            anno.status === 'resolved'
+                              ? 'bg-emerald-500/10 text-emerald-400'
+                              : 'bg-white/[0.05] text-zinc-400'
+                          }`}
+                        >
+                          {anno.status}
+                        </span>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDeleteAnnotation(anno);
+                          }}
+                          className="opacity-40 hover:opacity-100 p-1 rounded hover:bg-rose-500/15 text-zinc-400 hover:text-rose-400 transition-all"
+                          title="Remove review pin"
+                        >
+                          <Trash2 className="w-3 h-3" />
+                        </button>
+                      </div>
                     </div>
                     <h5 className="font-medium text-zinc-200 text-xs truncate">{anno.title}</h5>
                     <p className="text-zinc-500 text-xs line-clamp-2 leading-relaxed">{anno.description}</p>

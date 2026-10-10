@@ -102,6 +102,23 @@ async function runSecurityTests() {
     !clientHasInternalNote
   );
 
+  // Pin Lifecycle & Removal Verification
+  const testPin = db.createAnnotation('proj-apex-001', admin, {
+    preview_id: 'prev-apex-01',
+    page_path: '/test-remove',
+    viewport_width: 1440,
+    viewport_height: 900,
+    position_x: 50,
+    position_y: 50,
+    title: 'Test Pin To Remove',
+    description: 'Temporary pin for delete verification',
+    priority: 'low',
+  });
+  const createdPinExists = db.annotations.some(a => a.id === testPin.id);
+  db.deleteAnnotation(testPin.id, admin);
+  const deletedPinRemoved = !db.annotations.some(a => a.id === testPin.id);
+  assert('Review pin creation and deletion verified', createdPinExists && deletedPinRemoved);
+
   // TEST 3: Vercel Preview Host Policy
   console.log('\n[Test Group 3: Vercel Deployment Host Security Policy]');
   let validPreviewAllowed = false;
