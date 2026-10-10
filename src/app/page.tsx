@@ -20,25 +20,22 @@ import {
   Monitor,
 } from 'lucide-react';
 
+import { HextorqLogo } from '@/components/common/HextorqLogo';
+
 export default function HomePage() {
   const { availableUsers, switchUser, currentUser } = useAuth();
 
   return (
     <div className="min-h-screen bg-[#08090D] text-zinc-100 flex flex-col justify-between selection:bg-zinc-700 selection:text-white">
       {/* Precision Top Navbar */}
-      <header className="border-b border-white/[0.07] bg-[#0A0B10]/90 backdrop-blur-md px-6 py-3.5 sticky top-0 z-40">
+      <header className="border-b border-white/[0.07] bg-[#0A0B10]/90 backdrop-blur-md px-6 py-3 sticky top-0 z-40">
         <div className="max-w-6xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-6 h-6 rounded-md bg-zinc-100 text-zinc-950 font-bold text-xs flex items-center justify-center font-mono">
-              N
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="font-semibold text-zinc-100 text-sm tracking-tight">Nexus</span>
-              <span className="text-[10px] font-mono uppercase bg-white/[0.06] text-zinc-400 px-1.5 py-0.5 rounded border border-white/[0.05]">
-                v1.0-prod
-              </span>
-            </div>
-          </div>
+          <Link href="/" className="flex items-center gap-3">
+            <HextorqLogo size="md" showWordmark={true} />
+            <span className="text-[10px] font-mono uppercase bg-white/[0.06] text-zinc-400 px-1.5 py-0.5 rounded border border-white/[0.05]">
+              v1.0-prod
+            </span>
+          </Link>
 
           <div className="flex items-center gap-3 text-xs">
             <Link
@@ -179,7 +176,10 @@ export default function HomePage() {
 
       {/* Footer */}
       <footer className="border-t border-white/[0.07] bg-[#0A0B10] py-8 text-center text-xs text-zinc-500 font-mono">
-        <p>Nexus Platform · Built for Engineering Agencies & Dedicated Client Teams</p>
+        <div className="flex flex-col items-center justify-center gap-2">
+          <HextorqLogo size="sm" showWordmark={true} />
+          <p className="text-[11px] text-zinc-500">Engineering Studio & Dedicated Client Workspace</p>
+        </div>
       </footer>
     </div>
   );

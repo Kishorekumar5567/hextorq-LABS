@@ -80,7 +80,7 @@ function PortalSidebarContent() {
       </div>
 
       {/* User Session Footer */}
-      <div className="p-3 border-t border-white/[0.07]">
+      <div className="p-3 border-t border-white/[0.07] space-y-2">
         <div className="flex items-center gap-2.5 p-1.5 rounded-lg hover:bg-white/[0.04] transition-colors">
           <img
             src={currentUser.avatar_url || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150'}
@@ -90,6 +90,14 @@ function PortalSidebarContent() {
           <div className="min-w-0 flex-1">
             <p className="text-xs font-medium text-zinc-200 truncate leading-tight">{currentUser.full_name}</p>
             <p className="text-[10px] text-zinc-500 truncate leading-tight mt-0.5">{clientOrg?.company_name || 'Client Org'}</p>
+          </div>
+        </div>
+
+        <div className="pt-2 border-t border-white/[0.04] flex items-center justify-between px-1">
+          <span className="text-[9px] font-mono text-zinc-500 uppercase tracking-wider">PLATFORM</span>
+          <div className="flex items-center gap-1.5">
+            <img src="/hextorq-logo.png" alt="Hextorq Labs" className="w-3.5 h-3.5 object-contain bg-white rounded p-0.2" />
+            <span className="text-[10px] font-mono font-semibold text-zinc-400">HEXTORQ LABS</span>
           </div>
         </div>
       </div>

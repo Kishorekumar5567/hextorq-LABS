@@ -15,6 +15,7 @@ import {
   Layers,
   CircleDot,
 } from 'lucide-react';
+import { HextorqLogo } from '@/components/common/HextorqLogo';
 
 const NAV_ITEMS = [
   { label: 'Overview', href: '/agency/dashboard', icon: LayoutDashboard },
@@ -34,18 +35,10 @@ function AgencySidebarContent() {
       <div>
         {/* Workspace Brand / Selector */}
         <div className="p-3.5 border-b border-white/[0.07]">
-          <div className="flex items-center justify-between p-1.5 rounded-lg hover:bg-white/[0.04] transition-colors cursor-pointer">
-            <div className="flex items-center gap-2.5">
-              <div className="w-6 h-6 rounded-md bg-zinc-100 text-zinc-950 font-bold text-xs flex items-center justify-center font-mono">
-                N
-              </div>
-              <div className="text-left">
-                <span className="font-semibold text-zinc-100 text-xs block leading-tight">Nexus Studio</span>
-                <span className="text-[10px] text-zinc-500 font-mono block">Agency Operations</span>
-              </div>
-            </div>
+          <Link href="/agency/dashboard" className="flex items-center justify-between p-1 rounded-lg hover:bg-white/[0.04] transition-colors cursor-pointer">
+            <HextorqLogo size="sm" showWordmark={true} />
             <ChevronDown className="w-3.5 h-3.5 text-zinc-500" />
-          </div>
+          </Link>
         </div>
 
         {/* Navigation */}

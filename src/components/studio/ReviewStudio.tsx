@@ -335,7 +335,7 @@ export function ReviewStudio({
                   <span>Authorize Payment & Confirm Order</span>
                 </button>
                 <p className="text-[11px] text-center text-zinc-500 mt-2 font-mono">
-                  Encrypted checkout via Stripe & Nexus Cloud.
+                  Encrypted checkout via Stripe & Hextorq Cloud.
                 </p>
               </div>
             </div>

@@ -14,8 +14,12 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Nexus — Client Collaboration SaaS for Modern Dev Agencies",
-  description: "Unified workspace for high-velocity software agencies and clients: live preview visual feedback, milestone sign-offs, meetings, tickets, and payments.",
+  title: "HEXTORQ LABS — Client Collaboration SaaS",
+  description: "Unified client collaboration platform by HEXTORQ LABS: live Vercel previews, visual review studio pins, milestone sign-offs, LiveKit video meetings, and payments.",
+  icons: {
+    icon: "/hextorq-logo.png",
+    apple: "/hextorq-logo.png",
+  },
 };
 
 export default function RootLayout({
@@ -28,7 +32,7 @@ export default function RootLayout({
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full dark antialiased`}
     >
-      <body className="min-h-full flex flex-col bg-[#080C15] text-slate-100 selection:bg-indigo-500/30 selection:text-indigo-200">
+      <body className="min-h-full flex flex-col bg-[#090A0F] text-zinc-100 selection:bg-white/[0.15] selection:text-white">
         <ClientProviders>{children}</ClientProviders>
       </body>
     </html>

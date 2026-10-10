@@ -49,7 +49,7 @@ export default function AgencyLayout({
           <div className="flex items-center gap-3">
             <span className="text-[11px] font-mono uppercase tracking-wider text-zinc-500">WORKSPACE:</span>
             <span className="text-xs px-2 py-0.5 rounded bg-white/[0.04] border border-white/[0.06] text-zinc-200 font-mono">
-              Nexus Engineering Studio
+              HEXTORQ LABS (Agency HQ)
             </span>
           </div>
 

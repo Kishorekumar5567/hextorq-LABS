@@ -62,10 +62,10 @@ export const INITIAL_PROFILES: UserProfile[] = [
 
 export const INITIAL_AGENCY: Agency = {
   id: 'agency-nexus-01',
-  name: 'Nexus Digital Engineering',
-  slug: 'nexus-studio',
-  logo_url: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=150&auto=format&fit=crop&q=80',
-  website: 'https://nexusstudio.io',
+  name: 'Hextorq Labs',
+  slug: 'hextorq-labs',
+  logo_url: '/hextorq-logo.png',
+  website: 'https://github.com/Kishorekumar5567/hextorq-LABS',
   created_at: '2026-01-01T00:00:00Z',
 };
 
