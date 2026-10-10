@@ -1,4 +1,4 @@
-# Nexus — Client Collaboration SaaS Platform for Modern Dev Agencies
+# hextorq-LABS — Nexus Client Collaboration SaaS Platform
 
 A unified, production-oriented client collaboration platform built for high-velocity software agencies and their clients. Nexus brings project management, Vercel staging preview registration, interactive visual feedback pin annotations, ticket tracking, encrypted file storage, LiveKit video meetings, milestone escrow sign-offs, and payment processing into a single multi-tenant workspace.
 
