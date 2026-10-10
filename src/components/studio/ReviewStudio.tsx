@@ -19,6 +19,10 @@ import {
   MousePointer,
   HelpCircle,
   Trash2,
+  Maximize2,
+  Minimize2,
+  PanelRightClose,
+  PanelRightOpen,
 } from 'lucide-react';
 
 export function ReviewStudio({
@@ -33,6 +37,8 @@ export function ReviewStudio({
   const { currentUser, isAgencyStaff } = useAuth();
   const [viewport, setViewport] = useState<'desktop' | 'tablet' | 'mobile'>('desktop');
   const [isAddMode, setIsAddMode] = useState(false);
+  const [isMaximized, setIsMaximized] = useState(false);
+  const [isInspectorOpen, setIsInspectorOpen] = useState(true);
   const [activePinId, setActivePinId] = useState<string | null>(null);
   const [annotations, setAnnotations] = useState<VisualAnnotation[]>(initialAnnotations);
   const [statusFilter, setStatusFilter] = useState<'all' | 'open' | 'resolved'>('all');
@@ -71,7 +77,7 @@ export function ReviewStudio({
 
   // Viewport sizes
   const viewportStyles = {
-    desktop: 'w-full max-w-[1240px]',
+    desktop: isMaximized ? 'w-full max-w-[1600px]' : 'w-full max-w-[1440px]',
     tablet: 'w-[768px]',
     mobile: 'w-[375px]',
   };
@@ -217,7 +223,11 @@ export function ReviewStudio({
   const activeAnnotation = annotations.find((a) => a.id === activePinId);
 
   return (
-    <div className="flex-1 flex flex-col min-h-0 bg-[#07080C] overflow-hidden select-none">
+    <div
+      className={`flex flex-col min-h-0 bg-[#07080C] overflow-hidden select-none transition-all ${
+        isMaximized ? 'fixed inset-0 z-50 w-screen h-screen' : 'flex-1'
+      }`}
+    >
       {/* Studio Precision Toolbar */}
       <div className="border-b border-white/[0.07] bg-[#0A0B10] px-4 py-2 flex items-center justify-between gap-4 shrink-0">
         <div className="flex items-center gap-3">
@@ -299,11 +309,39 @@ export function ReviewStudio({
           </button>
         </div>
 
-        {/* Live Vercel Status Bar */}
-        <div className="flex items-center gap-3">
+        {/* Live Vercel Status & View Controls */}
+        <div className="flex items-center gap-2.5">
+          {/* Full Screen Mode Toggle */}
+          <button
+            onClick={() => setIsMaximized(!isMaximized)}
+            className={`px-2.5 py-1 rounded-lg text-xs font-medium border flex items-center gap-1.5 transition-all ${
+              isMaximized
+                ? 'bg-zinc-100 text-zinc-950 font-semibold border-white shadow-xs'
+                : 'bg-white/[0.04] hover:bg-white/[0.08] text-zinc-300 border-white/[0.08]'
+            }`}
+            title={isMaximized ? 'Exit Full Screen Mode' : 'Expand Studio to Full Screen'}
+          >
+            {isMaximized ? <Minimize2 className="w-3.5 h-3.5" /> : <Maximize2 className="w-3.5 h-3.5" />}
+            <span className="hidden sm:inline">{isMaximized ? 'Exit Full Screen' : 'Full Screen Studio'}</span>
+          </button>
+
+          {/* Toggle Pins Sidebar */}
+          <button
+            onClick={() => setIsInspectorOpen(!isInspectorOpen)}
+            className={`px-2.5 py-1 rounded-lg text-xs font-medium border flex items-center gap-1.5 transition-all ${
+              !isInspectorOpen
+                ? 'bg-amber-400/15 text-amber-300 font-semibold border-amber-400/30'
+                : 'bg-white/[0.04] hover:bg-white/[0.08] text-zinc-300 border-white/[0.08]'
+            }`}
+            title={isInspectorOpen ? 'Hide Pins Panel to maximize preview' : 'Open Pins Panel'}
+          >
+            {isInspectorOpen ? <PanelRightClose className="w-3.5 h-3.5" /> : <PanelRightOpen className="w-3.5 h-3.5" />}
+            <span className="hidden sm:inline">{isInspectorOpen ? 'Hide Pins' : `Pins (${annotations.length})`}</span>
+          </button>
+
           <div className="flex items-center gap-2 text-xs bg-emerald-500/[0.08] border border-emerald-500/20 px-2.5 py-1 rounded-md text-emerald-400 font-mono">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-            <span className="hidden sm:inline">Vercel Edge Ready · 200 OK</span>
+            <span className="hidden sm:inline">Vercel Live</span>
             <a
               href={targetUrl}
               target="_blank"
@@ -329,11 +367,13 @@ export function ReviewStudio({
       {/* Main Studio Workspace */}
       <div className="flex-1 flex min-h-0 overflow-hidden">
         {/* Canvas Area */}
-        <div className="flex-1 bg-[#050608] min-h-0 overflow-auto flex items-center justify-center p-4 relative">
+        <div className="flex-1 bg-[#050608] min-h-0 overflow-auto flex items-center justify-center p-3 sm:p-4 relative">
           <div
             ref={canvasRef}
             onClick={handleCanvasClick}
-            className={`${viewportStyles[viewport]} h-full max-h-[calc(100vh-230px)] min-h-[520px] rounded-xl border border-white/[0.08] bg-[#0E1017] shadow-2xl relative transition-all duration-200 flex flex-col overflow-hidden ${
+            className={`${viewportStyles[viewport]} h-full ${
+              isMaximized ? 'max-h-[calc(100vh-65px)]' : 'max-h-[calc(100vh-210px)]'
+            } min-h-[580px] rounded-xl border border-white/[0.08] bg-[#0E1017] shadow-2xl relative transition-all duration-200 flex flex-col overflow-hidden ${
               isAddMode ? 'cursor-crosshair ring-2 ring-amber-400/60 shadow-amber-500/10' : 'cursor-default'
             }`}
           >
@@ -443,7 +483,8 @@ export function ReviewStudio({
         </div>
 
         {/* Right Inspector & Discussion Sidebar */}
-        <div className="w-88 border-l border-white/[0.07] bg-[#0A0B10] flex flex-col shrink-0">
+        {isInspectorOpen && (
+          <div className="w-88 border-l border-white/[0.07] bg-[#0A0B10] flex flex-col shrink-0 animate-in slide-in-from-right duration-150">
           <div className="p-3 border-b border-white/[0.07] flex items-center justify-between">
             <span className="font-semibold text-zinc-100 text-xs">Review Pins ({annotations.length})</span>
             <div className="flex items-center gap-1 text-[11px] bg-white/[0.04] p-0.5 rounded-md border border-white/[0.06]">
@@ -682,6 +723,7 @@ export function ReviewStudio({
             </div>
           )}
         </div>
+        )}
       </div>
 
       {/* Register Vercel Preview Modal */}
