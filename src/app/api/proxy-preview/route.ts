@@ -67,11 +67,41 @@ export async function GET(req: NextRequest) {
     const origin = parsedUrl.origin;
 
     // Inject <base> tag so all relative assets (CSS, JS, fonts, images) load from target origin
-    const baseTag = `<base href="${origin}/" target="_blank" />`;
+    const studioInjection = `
+    <base href="${origin}/" target="_blank" />
+    <style id="hextorq-studio-overrides">
+      /* Dismiss blocking splash dialogs and ensure full scrollability */
+      div[aria-label="Harry Clinton intro"],
+      div[role="dialog"][aria-label*="intro"],
+      div[class*="z-[100]"][class*="fixed"] {
+        display: none !important;
+        pointer-events: none !important;
+      }
+      html, body {
+        overflow: auto !important;
+        min-height: 100% !important;
+        touch-action: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+      }
+    </style>
+    <script id="hextorq-studio-helper">
+      try {
+        function dismissSplash() {
+          var skipBtns = document.querySelectorAll('button[aria-label*="Skip"], button[aria-label*="skip"]');
+          skipBtns.forEach(function(b) { b.click(); });
+          document.body.style.overflow = 'auto';
+        }
+        document.addEventListener('DOMContentLoaded', dismissSplash);
+        setTimeout(dismissSplash, 300);
+        setTimeout(dismissSplash, 1000);
+      } catch(e) {}
+    </script>
+    `;
+
     if (/<head[^>]*>/i.test(html)) {
-      html = html.replace(/(<head[^>]*>)/i, `$1\n    ${baseTag}`);
+      html = html.replace(/(<head[^>]*>)/i, `$1\n${studioInjection}`);
     } else {
-      html = `<head>${baseTag}</head>${html}`;
+      html = `<head>${studioInjection}</head>${html}`;
     }
 
     // Rewrite root-relative URLs in HTML attributes so that assets resolve directly against target origin

@@ -39,6 +39,11 @@ export function ReviewStudio({
   const [iframeKey, setIframeKey] = useState<number>(1);
   const [isIframeLoading, setIsIframeLoading] = useState(true);
 
+  React.useEffect(() => {
+    const timer = setTimeout(() => setIsIframeLoading(false), 800);
+    return () => clearTimeout(timer);
+  }, [iframeKey]);
+
   // New pin draft state
   const [draftPin, setDraftPin] = useState<{
     x: number;
@@ -253,18 +258,33 @@ export function ReviewStudio({
             </button>
           </div>
 
-          {/* Mode Selector */}
-          <button
-            onClick={() => setIsAddMode(!isAddMode)}
-            className={`px-3 py-1.5 rounded-lg text-xs font-medium flex items-center gap-1.5 transition-all border ${
-              isAddMode
-                ? 'bg-amber-400 text-zinc-950 font-bold border-amber-300 shadow-md animate-pulse'
-                : 'bg-white/[0.04] text-zinc-300 hover:bg-white/[0.08] border-white/[0.08]'
-            }`}
-          >
-            {isAddMode ? <MousePointer className="w-3.5 h-3.5" /> : <Plus className="w-3.5 h-3.5" />}
-            <span>{isAddMode ? 'Click Anywhere on Page to Pin...' : 'Drop Pin Feedback'}</span>
-          </button>
+          {/* Mode Switcher: Browse vs Pin Feedback */}
+          <div className="flex items-center gap-0.5 bg-[#12141C] border border-white/[0.07] p-0.5 rounded-lg">
+            <button
+              onClick={() => setIsAddMode(false)}
+              className={`px-2.5 py-1 rounded text-xs font-medium flex items-center gap-1.5 transition-all ${
+                !isAddMode
+                  ? 'bg-emerald-500/15 text-emerald-300 font-semibold border border-emerald-500/25 shadow-xs'
+                  : 'text-zinc-400 hover:text-zinc-200'
+              }`}
+              title="Click links, buttons, and scroll the live website"
+            >
+              <MousePointer className="w-3.5 h-3.5 text-emerald-400" />
+              <span>Browse & Click Site</span>
+            </button>
+            <button
+              onClick={() => setIsAddMode(true)}
+              className={`px-2.5 py-1 rounded text-xs font-medium flex items-center gap-1.5 transition-all ${
+                isAddMode
+                  ? 'bg-amber-400 text-zinc-950 font-bold border border-amber-300 shadow-md animate-pulse'
+                  : 'text-zinc-400 hover:text-zinc-200'
+              }`}
+              title="Click on the page to drop a visual feedback pin"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              <span>Drop Pin Feedback</span>
+            </button>
+          </div>
 
           {/* Reload Preview Button */}
           <button
@@ -347,28 +367,20 @@ export function ReviewStudio({
                 src={proxyUrl}
                 title="Harry Clinton Bespoke Menswear - Live Vercel Staging"
                 onLoad={() => setIsIframeLoading(false)}
-                className={`w-full h-full border-0 bg-neutral-950 transition-opacity duration-300 ${
-                  isIframeLoading ? 'opacity-40' : 'opacity-100'
-                }`}
-                sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
+                className="w-full h-full border-0 bg-neutral-950"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals allow-downloads"
               />
 
-              {/* Loading Shimmer */}
-              {isIframeLoading && (
-                <div className="absolute inset-0 flex items-center justify-center bg-black/60 pointer-events-none">
-                  <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-zinc-900 border border-white/10 text-xs text-zinc-300 font-mono">
-                    <RotateCw className="w-3.5 h-3.5 animate-spin text-zinc-400" />
-                    <span>Streaming live deployment...</span>
-                  </div>
-                </div>
-              )}
-
-              {/* Click Interception Layer when Pin Mode is Active */}
+              {/* Click Interception Layer ONLY when Pin Mode is Active */}
               {isAddMode && (
-                <div className="absolute inset-0 z-20 cursor-crosshair bg-amber-500/[0.05] border-2 border-dashed border-amber-400/40 flex items-start justify-center pt-3 pointer-events-none">
-                  <div className="px-3 py-1 rounded-full bg-amber-400 text-zinc-950 text-xs font-bold shadow-lg flex items-center gap-1.5">
-                    <MousePointer className="w-3 h-3" />
-                    <span>Click anywhere on the preview to place pin</span>
+                <div
+                  onClick={handleCanvasClick}
+                  className="absolute inset-0 z-20 cursor-crosshair bg-amber-500/[0.08] border-2 border-dashed border-amber-400/50 flex items-start justify-center pt-3 pointer-events-auto select-none"
+                >
+                  <div className="px-3.5 py-1.5 rounded-full bg-amber-400 text-zinc-950 text-xs font-bold shadow-xl flex items-center gap-1.5 pointer-events-none animate-bounce">
+                    <MousePointer className="w-3.5 h-3.5" />
+                    <span>Click anywhere on the website to drop review pin</span>
                   </div>
                 </div>
               )}
