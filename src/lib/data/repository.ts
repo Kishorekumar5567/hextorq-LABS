@@ -228,6 +228,7 @@ class RepositoryStore {
       viewport_height: number;
       position_x: number;
       position_y: number;
+      document_y?: number;
       element_selector?: string;
       screenshot_url?: string;
       title: string;
@@ -249,6 +250,7 @@ class RepositoryStore {
       viewport_height: data.viewport_height,
       position_x: data.position_x,
       position_y: data.position_y,
+      document_y: data.document_y,
       element_selector: data.element_selector,
       screenshot_url: data.screenshot_url,
       status: 'open',

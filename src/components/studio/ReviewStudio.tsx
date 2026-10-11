@@ -44,16 +44,111 @@ export function ReviewStudio({
   const [statusFilter, setStatusFilter] = useState<'all' | 'open' | 'resolved'>('all');
   const [iframeKey, setIframeKey] = useState<number>(1);
   const [isIframeLoading, setIsIframeLoading] = useState(true);
+  const [iframeScrollY, setIframeScrollY] = useState(0);
+  const [isFrameReady, setIsFrameReady] = useState(false);
+
+  const iframeRef = useRef<HTMLIFrameElement>(null);
+  const canvasRef = useRef<HTMLDivElement>(null);
 
   React.useEffect(() => {
     const timer = setTimeout(() => setIsIframeLoading(false), 800);
     return () => clearTimeout(timer);
   }, [iframeKey]);
 
+  // Sync pins to live iframe so they scroll with page natively
+  const syncPinsToIframe = () => {
+    if (iframeRef.current?.contentWindow) {
+      try {
+        iframeRef.current.contentWindow.postMessage(
+          {
+            type: 'HEXTORQ_SYNC_PINS',
+            pins: annotations.map((a) => ({
+              ...a,
+              document_y: a.document_y !== undefined ? a.document_y : (a.position_y / 100) * 900,
+            })),
+            activePinId,
+          },
+          '*'
+        );
+      } catch (e) {}
+    }
+  };
+
+  React.useEffect(() => {
+    syncPinsToIframe();
+  }, [annotations, activePinId, isFrameReady]);
+
+  React.useEffect(() => {
+    if (iframeRef.current?.contentWindow) {
+      try {
+        iframeRef.current.contentWindow.postMessage(
+          {
+            type: 'HEXTORQ_SET_PIN_MODE',
+            enabled: isAddMode,
+          },
+          '*'
+        );
+      } catch (e) {}
+    }
+  }, [isAddMode]);
+
+  React.useEffect(() => {
+    const handleMessage = (event: MessageEvent) => {
+      if (!event.data) return;
+
+      if (event.data.type === 'HEXTORQ_FRAME_READY') {
+        setIsFrameReady(true);
+        setIsIframeLoading(false);
+        syncPinsToIframe();
+      }
+
+      if (event.data.type === 'HEXTORQ_STUDIO_SCROLL') {
+        setIframeScrollY(event.data.scrollY || 0);
+      }
+
+      if (event.data.type === 'HEXTORQ_SELECT_PIN') {
+        setActivePinId(event.data.pinId);
+        setIsInspectorOpen(true);
+      }
+
+      if (event.data.type === 'HEXTORQ_PIN_DROPPED') {
+        setDraftPin({
+          x: event.data.position_x,
+          y: event.data.position_y,
+          document_y: event.data.document_y,
+          title: '',
+          description: '',
+          priority: 'medium',
+        });
+        setIsAddMode(false);
+      }
+    };
+
+    window.addEventListener('message', handleMessage);
+    return () => window.removeEventListener('message', handleMessage);
+  }, [annotations, activePinId]);
+
+  const handleSelectPin = (anno: VisualAnnotation) => {
+    setActivePinId(anno.id);
+    const docY = anno.document_y !== undefined ? anno.document_y : (anno.position_y / 100) * 900;
+    if (iframeRef.current?.contentWindow) {
+      try {
+        iframeRef.current.contentWindow.postMessage(
+          {
+            type: 'HEXTORQ_SCROLL_TO',
+            top: Math.max(0, docY - 140),
+          },
+          '*'
+        );
+      } catch (e) {}
+    }
+  };
+
   // New pin draft state
   const [draftPin, setDraftPin] = useState<{
     x: number;
     y: number;
+    document_y?: number;
     title: string;
     description: string;
     priority: VisualAnnotation['priority'];
@@ -68,8 +163,6 @@ export function ReviewStudio({
   const [newDeployUrl, setNewDeployUrl] = useState('');
   const [newDeployBranch, setNewDeployBranch] = useState('feat/staging-preview');
   const [deployError, setDeployError] = useState('');
-
-  const canvasRef = useRef<HTMLDivElement>(null);
 
   // Active target deployment URL (defaults to live Vercel deployment)
   const targetUrl = initialPreview?.deployment_url || 'https://harry-clinton.vercel.app';
@@ -94,10 +187,12 @@ export function ReviewStudio({
     const rect = canvasRef.current.getBoundingClientRect();
     const x = Number((((e.clientX - rect.left) / rect.width) * 100).toFixed(2));
     const y = Number((((e.clientY - rect.top) / rect.height) * 100).toFixed(2));
+    const pageY = Math.round((y / 100) * (canvasRef.current.clientHeight || 900) + iframeScrollY);
 
     setDraftPin({
       x,
       y,
+      document_y: pageY,
       title: '',
       description: '',
       priority: 'medium',
@@ -116,6 +211,7 @@ export function ReviewStudio({
         viewport_height: 900,
         position_x: draftPin.x,
         position_y: draftPin.y,
+        document_y: draftPin.document_y,
         element_selector: '#live-preview-viewport',
         title: draftPin.title,
         description: draftPin.description,
@@ -403,10 +499,15 @@ export function ReviewStudio({
             <div className="relative flex-1 bg-black overflow-hidden">
               {/* Live Webpage via Secure Proxy */}
               <iframe
+                ref={iframeRef}
                 key={iframeKey}
                 src={proxyUrl}
                 title="Harry Clinton Bespoke Menswear - Live Vercel Staging"
-                onLoad={() => setIsIframeLoading(false)}
+                onLoad={() => {
+                  setIsIframeLoading(false);
+                  setIsFrameReady(true);
+                  syncPinsToIframe();
+                }}
                 className="w-full h-full border-0 bg-neutral-950"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                 sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals allow-downloads"
@@ -425,52 +526,58 @@ export function ReviewStudio({
                 </div>
               )}
 
-              {/* Visual Feedback Pins Placed on Canvas */}
-              {annotations.map((anno) => {
-                const isResolved = anno.status === 'resolved';
-                const isSelected = activePinId === anno.id;
-                return (
-                  <div
-                    key={anno.id}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setActivePinId(anno.id);
-                    }}
-                    style={{
-                      left: `${anno.position_x}%`,
-                      top: `${anno.position_y}%`,
-                    }}
-                    className={`absolute -translate-x-1/2 -translate-y-1/2 cursor-pointer z-30 group transition-all transform pointer-events-auto ${
-                      isSelected ? 'scale-115' : 'hover:scale-105'
-                    }`}
-                  >
+              {/* Visual Feedback Pins Placed on Canvas (Fallback before frame sync) */}
+              {!isFrameReady &&
+                annotations.map((anno) => {
+                  const isResolved = anno.status === 'resolved';
+                  const isSelected = activePinId === anno.id;
+                  const docY = anno.document_y !== undefined ? anno.document_y : (anno.position_y / 100) * 900;
+                  const screenY = docY - iframeScrollY;
+                  return (
                     <div
-                      className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-mono font-bold shadow-2xl border transition-all ${
-                        isResolved
-                          ? 'bg-zinc-800 text-zinc-400 border-zinc-700'
-                          : isSelected
-                          ? 'bg-amber-400 text-zinc-950 border-white ring-4 ring-amber-400/30'
-                          : 'bg-zinc-900 text-white border-white/30 hover:border-white'
+                      key={anno.id}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleSelectPin(anno);
+                      }}
+                      style={{
+                        left: `${anno.position_x}%`,
+                        top: `${screenY}px`,
+                      }}
+                      className={`absolute -translate-x-1/2 -translate-y-1/2 cursor-pointer z-30 group transition-all transform pointer-events-auto ${
+                        isSelected ? 'scale-115' : 'hover:scale-105'
                       }`}
                     >
-                      {anno.pin_number}
-                    </div>
+                      <div
+                        className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-mono font-bold shadow-2xl border transition-all ${
+                          isResolved
+                            ? 'bg-zinc-800 text-zinc-400 border-zinc-700'
+                            : isSelected
+                            ? 'bg-amber-400 text-zinc-950 border-white ring-4 ring-amber-400/30'
+                            : 'bg-zinc-900 text-white border-white/30 hover:border-white'
+                        }`}
+                      >
+                        {anno.pin_number}
+                      </div>
 
-                    {/* Micro Tooltip on Hover */}
-                    <div className="absolute left-1/2 -translate-x-1/2 top-full mt-2 hidden group-hover:block z-40 w-48 p-2 rounded-lg bg-[#0E1017] border border-white/[0.1] text-zinc-200 text-xs shadow-2xl pointer-events-none">
-                      <p className="font-semibold text-zinc-100 truncate">{anno.title}</p>
-                      <p className="text-[10px] text-zinc-400 font-mono mt-0.5 uppercase">
-                        {anno.priority} · {anno.status}
-                      </p>
+                      {/* Micro Tooltip on Hover */}
+                      <div className="absolute left-1/2 -translate-x-1/2 top-full mt-2 hidden group-hover:block z-40 w-48 p-2 rounded-lg bg-[#0E1017] border border-white/[0.1] text-zinc-200 text-xs shadow-2xl pointer-events-none">
+                        <p className="font-semibold text-zinc-100 truncate">{anno.title}</p>
+                        <p className="text-[10px] text-zinc-400 font-mono mt-0.5 uppercase">
+                          {anno.priority} · {anno.status}
+                        </p>
+                      </div>
                     </div>
-                  </div>
-                );
-              })}
+                  );
+                })}
 
               {/* Draft Marker */}
               {draftPin && (
                 <div
-                  style={{ left: `${draftPin.x}%`, top: `${draftPin.y}%` }}
+                  style={{
+                    left: `${draftPin.x}%`,
+                    top: draftPin.document_y !== undefined ? `${draftPin.document_y - iframeScrollY}px` : `${draftPin.y}%`,
+                  }}
                   className="absolute -translate-x-1/2 -translate-y-1/2 z-40 pointer-events-none"
                 >
                   <div className="w-8 h-8 rounded-full bg-amber-400 text-zinc-950 font-bold flex items-center justify-center text-sm border-2 border-white animate-pulse shadow-2xl font-mono">
@@ -682,7 +789,7 @@ export function ReviewStudio({
                 filteredAnnotations.map((anno) => (
                   <div
                     key={anno.id}
-                    onClick={() => setActivePinId(anno.id)}
+                    onClick={() => handleSelectPin(anno)}
                     className="p-3.5 hover:bg-white/[0.03] cursor-pointer transition-colors space-y-1.5"
                   >
                     <div className="flex items-center justify-between">

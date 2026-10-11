@@ -113,6 +113,7 @@ export interface VisualAnnotation {
   viewport_height: number;
   position_x: number; // 0 - 100 percentage
   position_y: number; // 0 - 100 percentage
+  document_y?: number; // Absolute document pixel coordinate
   element_selector?: string;
   screenshot_url?: string;
   status: TicketStatus;
